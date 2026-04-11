@@ -16,6 +16,7 @@ import {
   Building2,
   Sparkles,
   Gauge,
+  LifeBuoy,
 } from "lucide-react";
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -321,6 +322,129 @@ export default function SettingsPage() {
             saving={saving === "agent"}
             saved={savedKey === "agent"}
             label="Save agent identity"
+          />
+        </div>
+      </Card>
+
+      {/* Fallback behaviour */}
+      <Card>
+        <div className="flex items-start gap-3">
+          <SectionIcon icon={LifeBuoy} />
+          <div className="flex-1">
+            <CardTitle>When the agent can&apos;t answer</CardTitle>
+            <CardDescription>
+              Decide exactly what your agent says when the knowledge base
+              doesn&apos;t cover a question — the message, who to point at,
+              and whether to proactively check in after answering.
+            </CardDescription>
+          </div>
+        </div>
+
+        <div className="mt-5 space-y-5">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-sand-800 tracking-tight">
+              Fallback message
+            </label>
+            <textarea
+              value={project.agentConfig.fallbackMessage || ""}
+              onChange={(e) =>
+                setProject({
+                  ...project,
+                  agentConfig: {
+                    ...project.agentConfig,
+                    fallbackMessage: e.target.value,
+                  },
+                })
+              }
+              rows={3}
+              placeholder="I don't have that info handy, but I can connect you with a teammate who does."
+              className="w-full bg-white border border-sand-200 rounded-xl px-4 py-3 text-[0.9375rem] text-sand-900 placeholder:text-sand-400 focus:border-sand-900 focus:ring-2 focus:ring-sand-900/10 focus:outline-none resize-none transition-all"
+            />
+            <p className="text-xs text-sand-500">
+              Shown whenever the agent doesn&apos;t find relevant content.
+              Leave blank to use the generic default.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Support email (optional)"
+              placeholder="support@yourcompany.com"
+              type="email"
+              value={project.agentConfig.fallbackContactEmail || ""}
+              onChange={(e) =>
+                setProject({
+                  ...project,
+                  agentConfig: {
+                    ...project.agentConfig,
+                    fallbackContactEmail: e.target.value,
+                  },
+                })
+              }
+              hint="Baked into the prompt verbatim so the agent never invents an address."
+            />
+            <Input
+              label="Help URL (optional)"
+              placeholder="https://help.yourcompany.com"
+              type="url"
+              value={project.agentConfig.fallbackContactUrl || ""}
+              onChange={(e) =>
+                setProject({
+                  ...project,
+                  agentConfig: {
+                    ...project.agentConfig,
+                    fallbackContactUrl: e.target.value,
+                  },
+                })
+              }
+              hint="Help center, contact form, Slack invite — whatever you use."
+            />
+          </div>
+
+          <label className="flex items-start gap-3 p-3 rounded-xl border border-sand-200 bg-white hover:border-sand-300 cursor-pointer transition-colors">
+            <input
+              type="checkbox"
+              checked={project.agentConfig.askForResolution === true}
+              onChange={(e) =>
+                setProject({
+                  ...project,
+                  agentConfig: {
+                    ...project.agentConfig,
+                    askForResolution: e.target.checked,
+                  },
+                })
+              }
+              className="mt-0.5 w-4 h-4 rounded border-sand-300 text-sand-900 focus:ring-sand-900/20 cursor-pointer"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-sand-900 tracking-tight">
+                Check in after answering
+              </p>
+              <p className="text-xs text-sand-500 mt-0.5 leading-relaxed">
+                Agent ends substantive replies with a short &ldquo;did that
+                solve it?&rdquo; nudge. Customers get an easier path to mark
+                the conversation resolved.
+              </p>
+            </div>
+          </label>
+
+          <SaveButton
+            onClick={() =>
+              saveProject("fallback", {
+                agentConfig: {
+                  fallbackMessage: project.agentConfig.fallbackMessage || "",
+                  fallbackContactEmail:
+                    project.agentConfig.fallbackContactEmail || "",
+                  fallbackContactUrl:
+                    project.agentConfig.fallbackContactUrl || "",
+                  askForResolution:
+                    project.agentConfig.askForResolution === true,
+                },
+              })
+            }
+            saving={saving === "fallback"}
+            saved={savedKey === "fallback"}
+            label="Save fallback settings"
           />
         </div>
       </Card>

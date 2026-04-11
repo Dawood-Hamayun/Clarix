@@ -5,6 +5,7 @@ import {
   MissingOpenAIKeyError,
 } from "@/lib/ai/client";
 import { retrieveContext } from "@/lib/ai/rag";
+import { checkChatRateLimit, rateLimitKey } from "@/lib/ai/rate-limit";
 import { store } from "@/lib/db/store";
 import type { SourceCitation } from "@/lib/db/types";
 
@@ -28,6 +29,27 @@ export async function POST(req: Request) {
     projectId?: string;
     conversationId?: string;
   } = await req.json();
+
+  // Rate limit before we touch OpenAI. Cheap first line of defense
+  // against a bot draining a customer's key through the public widget.
+  const limit = checkChatRateLimit(rateLimitKey(req, conversationId));
+  if (!limit.ok) {
+    return NextResponse.json(
+      {
+        error: "Too many messages. Please wait a moment and try again.",
+        code: "rate_limited",
+        retryAfterSeconds: limit.retryAfterSeconds,
+      },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(limit.retryAfterSeconds),
+          "X-RateLimit-Limit": String(limit.limit),
+          "X-RateLimit-Remaining": "0",
+        },
+      }
+    );
+  }
 
   // Extract text from the last user message's parts (AI SDK v6 UIMessage shape)
   const lastUserMessage = [...messages]

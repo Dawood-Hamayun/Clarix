@@ -449,15 +449,21 @@ class MemoryStore {
   }
 
   /**
-   * Derive a conversation's status from the thumbs feedback on its
-   * query events. Single source of truth for the "Resolved" pill on
-   * conversation rows and the Resolution-rate metric on the dashboard.
+   * Derive a conversation's status. Priority order:
    *
-   * - ≥1 👍 and 0 👎  → `resolved`
-   * - ≥1 👎           → `unresolved`
-   * - otherwise       → `unrated`
+   * 1. **Explicit customer choice** (`metadata.customerResolution`) —
+   *    wins over everything. When someone clicks "Yes, this helped" at
+   *    the end of a chat, that's the strongest possible signal.
+   * 2. **Per-message thumbs feedback** aggregated across query events:
+   *    - ≥1 👍 and 0 👎 → `resolved`
+   *    - ≥1 👎           → `unresolved`
+   * 3. Otherwise → `unrated`.
    */
   getConversationStatus(conversationId: string): ConversationStatus {
+    const conv = this.conversations.get(conversationId);
+    if (conv?.metadata.customerResolution === "resolved") return "resolved";
+    if (conv?.metadata.customerResolution === "unresolved") return "unresolved";
+
     let up = 0;
     let down = 0;
     for (const e of this.queryEvents.values()) {
@@ -468,6 +474,26 @@ class MemoryStore {
     if (down > 0) return "unresolved";
     if (up > 0) return "resolved";
     return "unrated";
+  }
+
+  /**
+   * Record an explicit customer resolution from the end-of-chat prompt
+   * or the "End chat" button. This overrides per-message thumbs when
+   * computing `getConversationStatus`.
+   */
+  setCustomerResolution(
+    conversationId: string,
+    value: "resolved" | "unresolved" | null
+  ): Conversation | undefined {
+    const conv = this.conversations.get(conversationId);
+    if (!conv) return undefined;
+    if (value === null) {
+      delete conv.metadata.customerResolution;
+    } else {
+      conv.metadata.customerResolution = value;
+    }
+    this.scheduleFlush();
+    return conv;
   }
 
   /**
