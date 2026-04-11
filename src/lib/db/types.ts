@@ -50,6 +50,27 @@ export interface AgentConfig {
   personality: AgentPersonality;
   /** One-line description of what the company does. Lives in prompts too. */
   tagline: string;
+  /**
+   * What the agent should say when the knowledge base doesn't have
+   * enough to answer a question. Users configure this in Settings so
+   * the fallback matches their brand voice. If blank, a generic
+   * fallback is used.
+   *
+   * Example: "I don't have that info handy, but I can connect you with
+   * a teammate who does."
+   */
+  fallbackMessage?: string;
+  /** Email to direct users to when the agent can't answer. */
+  fallbackContactEmail?: string;
+  /** URL (help center, contact form, Slack, etc.) to direct users to. */
+  fallbackContactUrl?: string;
+  /**
+   * When true, the agent will proactively check in after it's answered
+   * a question — e.g. "Did that solve it?" — so customers have an easy
+   * path to mark the conversation resolved without waiting to click
+   * 👍. Disabled by default because it can feel pushy.
+   */
+  askForResolution?: boolean;
 }
 
 /**
@@ -133,6 +154,14 @@ export interface Conversation {
     resolved: boolean;
     satisfaction?: number;
     customerName?: string;
+    /**
+     * Explicit resolution signal from the customer — set when they
+     * click "Yes, this helped" / "No, I still need help" on the
+     * end-of-chat prompt. Overrides the per-message feedback
+     * aggregation in `getConversationStatus` so an intentional
+     * answer always wins.
+     */
+    customerResolution?: "resolved" | "unresolved";
   };
   /**
    * Derived client-facing status. Populated by API routes before the

@@ -212,8 +212,10 @@ export default function PlaygroundPage() {
           )}
         </div>
 
-        {/* Sidebar - KB info */}
-        <div className="space-y-4">
+        {/* Sidebar - KB info. Matches the chat's height exactly so the
+            sources panel can scroll internally instead of pushing the
+            whole page into scroll mode. */}
+        <div className="flex flex-col gap-4 h-[calc(100vh-14rem)] min-h-[480px]">
           <div className="bg-sand-100 border border-sand-200 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-3">
               <BookOpen className="w-4 h-4 text-warm-orange" />
@@ -295,9 +297,11 @@ export default function PlaygroundPage() {
             </ol>
           </div>
 
-          {/* Sources inspector */}
-          <div className="bg-sand-100 border border-sand-200 rounded-xl overflow-hidden">
-            <div className="px-5 pt-5 pb-3">
+          {/* Sources inspector — flex-1 so it absorbs whatever vertical
+              space the two cards above leave behind, with its own
+              internal scroll so long source lists don't push the page. */}
+          <div className="bg-sand-100 border border-sand-200 rounded-xl overflow-hidden flex-1 min-h-0 flex flex-col">
+            <div className="px-5 pt-5 pb-3 shrink-0">
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-warm-orange" />
                 <h3 className="text-sm font-semibold text-sand-900">
@@ -320,7 +324,7 @@ export default function PlaygroundPage() {
               )}
             </div>
 
-            <div className="px-5 pb-5 max-h-80 overflow-y-auto">
+            <div className="px-5 pb-5 flex-1 min-h-0 overflow-y-auto">
               <AnimatePresence mode="wait">
                 {retrieved.length > 0 ? (
                   <motion.div
