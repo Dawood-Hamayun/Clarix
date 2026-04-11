@@ -14,7 +14,6 @@ import {
   AlertCircle,
   Target,
   Loader2,
-  RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -167,35 +166,16 @@ export default function PlaygroundPage() {
     }
   };
 
+  const headerSubtitle = hydrating
+    ? "Restoring your session…"
+    : initialMessages.length > 0
+      ? `Continuing your session · ${initialMessages.length} message${
+          initialMessages.length === 1 ? "" : "s"
+        }`
+      : "New session — ask anything to get started";
+
   return (
     <div>
-      {/* Header row: thread controls */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="text-xs uppercase tracking-wide font-bold text-sand-400">
-            Playground
-          </p>
-          <p className="text-sm text-sand-600 mt-0.5">
-            {hydrating
-              ? "Restoring your session…"
-              : initialMessages.length > 0
-                ? `Continuing your session (${initialMessages.length} message${
-                    initialMessages.length === 1 ? "" : "s"
-                  })`
-              : "New session — ask anything to get started"}
-          </p>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleStartFresh}
-          disabled={hydrating}
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          Start fresh
-        </Button>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chat */}
         <div className="lg:col-span-2">
@@ -205,6 +185,10 @@ export default function PlaygroundPage() {
               initialMessages={initialMessages}
               suggestions={suggestions}
               onUserMessage={handleUserMessage}
+              title="Playground"
+              subtitle={headerSubtitle}
+              onStartFresh={handleStartFresh}
+              startFreshDisabled={hydrating}
             />
           )}
           {hydrating && (
@@ -212,94 +196,13 @@ export default function PlaygroundPage() {
           )}
         </div>
 
-        {/* Sidebar - KB info. Matches the chat's height exactly so the
-            sources panel can scroll internally instead of pushing the
-            whole page into scroll mode. */}
+        {/* Sidebar — order is intentional: the live retrieval inspector
+            sits at the top because it's the only panel that changes
+            with each question. The static "How it works" rationale and
+            the KB summary live below so they don't push real-time
+            information off screen. */}
         <div className="flex flex-col gap-4 h-[calc(100vh-14rem)] min-h-[480px]">
-          <div className="bg-sand-100 border border-sand-200 rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <BookOpen className="w-4 h-4 text-warm-orange" />
-              <h3 className="text-sm font-semibold text-sand-900">
-                Knowledge Base
-              </h3>
-            </div>
-
-            {readySources.length > 0 ? (
-              <>
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-white rounded-lg p-3 border border-sand-200">
-                    <p className="text-2xl font-bold text-sand-900">
-                      {readySources.length}
-                    </p>
-                    <p className="text-xs text-sand-500">Sources</p>
-                  </div>
-                  <div className="bg-white rounded-lg p-3 border border-sand-200">
-                    <p className="text-2xl font-bold text-sand-900">
-                      {totalChunks}
-                    </p>
-                    <p className="text-xs text-sand-500">Chunks</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {readySources.slice(0, 5).map((source) => (
-                    <Link
-                      key={source.id}
-                      href={`/dashboard/knowledge/${source.id}`}
-                      className="flex items-center gap-2 text-xs hover:bg-sand-50 rounded-md px-1.5 py-1 -mx-1.5 transition-colors cursor-pointer"
-                    >
-                      <div className="w-1.5 h-1.5 rounded-full bg-status-success" />
-                      <span className="text-sand-700 truncate">
-                        {source.name}
-                      </span>
-                      <span className="text-sand-400 ml-auto">
-                        {source.metadata.chunkCount} chunks
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-4">
-                <AlertCircle className="w-8 h-8 text-sand-300 mx-auto mb-2" />
-                <p className="text-xs text-sand-500 mb-3">
-                  No knowledge sources yet. Add content to test the AI.
-                </p>
-                <Link href="/dashboard/knowledge/new">
-                  <Button size="sm">Add Source</Button>
-                </Link>
-              </div>
-            )}
-          </div>
-
-          <div className="bg-sand-100 border border-sand-200 rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-sand-900 mb-2">
-              How it works
-            </h3>
-            <ol className="space-y-2 text-xs text-sand-600">
-              <li className="flex gap-2">
-                <span className="w-5 h-5 rounded-full bg-warm-orange-light text-warm-orange text-xs flex items-center justify-center shrink-0 font-medium">
-                  1
-                </span>
-                Your question gets embedded into a vector
-              </li>
-              <li className="flex gap-2">
-                <span className="w-5 h-5 rounded-full bg-warm-orange-light text-warm-orange text-xs flex items-center justify-center shrink-0 font-medium">
-                  2
-                </span>
-                We find the most relevant chunks from your KB
-              </li>
-              <li className="flex gap-2">
-                <span className="w-5 h-5 rounded-full bg-warm-orange-light text-warm-orange text-xs flex items-center justify-center shrink-0 font-medium">
-                  3
-                </span>
-                GPT-4o answers using only that context
-              </li>
-            </ol>
-          </div>
-
-          {/* Sources inspector — flex-1 so it absorbs whatever vertical
-              space the two cards above leave behind, with its own
-              internal scroll so long source lists don't push the page. */}
+          {/* 1. Retrieved sources — primary, flex-1 */}
           <div className="bg-sand-100 border border-sand-200 rounded-xl overflow-hidden flex-1 min-h-0 flex flex-col">
             <div className="px-5 pt-5 pb-3 shrink-0">
               <div className="flex items-center gap-2">
@@ -375,6 +278,70 @@ export default function PlaygroundPage() {
                 )}
               </AnimatePresence>
             </div>
+          </div>
+
+          {/* 2. How it works */}
+          <div className="bg-sand-100 border border-sand-200 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-sand-900 mb-2">
+              How it works
+            </h3>
+            <ol className="space-y-2 text-xs text-sand-600">
+              <li className="flex gap-2">
+                <span className="w-5 h-5 rounded-full bg-warm-orange-light text-warm-orange text-xs flex items-center justify-center shrink-0 font-medium">
+                  1
+                </span>
+                Your question gets embedded into a vector
+              </li>
+              <li className="flex gap-2">
+                <span className="w-5 h-5 rounded-full bg-warm-orange-light text-warm-orange text-xs flex items-center justify-center shrink-0 font-medium">
+                  2
+                </span>
+                We find the most relevant chunks from your KB
+              </li>
+              <li className="flex gap-2">
+                <span className="w-5 h-5 rounded-full bg-warm-orange-light text-warm-orange text-xs flex items-center justify-center shrink-0 font-medium">
+                  3
+                </span>
+                GPT-4o answers using only that context
+              </li>
+            </ol>
+          </div>
+
+          {/* 3. Knowledge Base summary */}
+          <div className="bg-sand-100 border border-sand-200 rounded-xl p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <BookOpen className="w-4 h-4 text-warm-orange" />
+              <h3 className="text-sm font-semibold text-sand-900">
+                Knowledge Base
+              </h3>
+            </div>
+
+            {readySources.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white rounded-lg p-3 border border-sand-200">
+                  <p className="text-2xl font-bold text-sand-900">
+                    {readySources.length}
+                  </p>
+                  <p className="text-xs text-sand-500">Sources</p>
+                </div>
+                <div className="bg-white rounded-lg p-3 border border-sand-200">
+                  <p className="text-2xl font-bold text-sand-900">
+                    {totalChunks}
+                  </p>
+                  <p className="text-xs text-sand-500">Chunks</p>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-2">
+                <AlertCircle className="w-8 h-8 text-sand-300 mx-auto mb-2" />
+                <p className="text-xs text-sand-500 mb-3">
+                  No knowledge sources yet. Add content to test the AI.
+                </p>
+                <Link href="/dashboard/knowledge/new">
+                  <Button size="sm">Add Source</Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

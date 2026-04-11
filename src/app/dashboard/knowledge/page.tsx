@@ -10,6 +10,7 @@ import {
   Layers,
   CheckCircle2,
   AlertCircle,
+  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,20 +38,52 @@ export default function KnowledgePage() {
   const [selected, setSelected] = useState<string>(ALL_CATEGORIES_ID);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [seedingDemo, setSeedingDemo] = useState(false);
+  const [seedError, setSeedError] = useState<string | null>(null);
+
+  async function refresh() {
+    const [sRes, cRes] = await Promise.all([
+      fetch("/api/knowledge"),
+      fetch("/api/categories"),
+    ]);
+    const [sData, cData] = await Promise.all([sRes.json(), cRes.json()]);
+    setSources(sData);
+    setCategories(cData);
+  }
 
   useEffect(() => {
     async function load() {
-      const [sRes, cRes] = await Promise.all([
-        fetch("/api/knowledge"),
-        fetch("/api/categories"),
-      ]);
-      const [sData, cData] = await Promise.all([sRes.json(), cRes.json()]);
-      setSources(sData);
-      setCategories(cData);
+      await refresh();
       setLoading(false);
     }
     load();
   }, []);
+
+  async function handleLoadDemo() {
+    setSeedingDemo(true);
+    setSeedError(null);
+    try {
+      const res = await fetch("/api/demo/seed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId: "proj_demo" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSeedError(
+          data?.code === "missing_openai_key"
+            ? "Add your OpenAI API key in Settings first, then try again."
+            : data?.error || "Couldn't load demo content. Try again."
+        );
+        return;
+      }
+      await refresh();
+    } catch {
+      setSeedError("Couldn't load demo content. Try again.");
+    } finally {
+      setSeedingDemo(false);
+    }
+  }
 
   const handleDelete = async (id: string) => {
     await fetch(`/api/knowledge/${id}`, { method: "DELETE" });
@@ -107,6 +140,17 @@ export default function KnowledgePage() {
           </div>
           <div className="flex items-center gap-2">
             <KBGuideButton />
+            {sources.length === 0 && !loading && (
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={handleLoadDemo}
+                disabled={seedingDemo}
+              >
+                <Wand2 className="w-4 h-4" />
+                {seedingDemo ? "Loading demo…" : "Load sample content"}
+              </Button>
+            )}
             <Link href={addHref}>
               <Button size="lg">
                 <Plus className="w-4 h-4" />
@@ -115,6 +159,11 @@ export default function KnowledgePage() {
             </Link>
           </div>
         </div>
+        {seedError && (
+          <div className="mt-4 text-sm bg-status-warning/10 border border-status-warning/30 text-status-warning rounded-xl px-4 py-3">
+            {seedError}
+          </div>
+        )}
 
         {/* Stat strip */}
         <div className="grid grid-cols-3 gap-4 mt-8">
@@ -288,6 +337,9 @@ export default function KnowledgePage() {
             <EmptyCategory
               category={activeCategory}
               addHref={addHref}
+              showDemoLoader={sources.length === 0}
+              onLoadDemo={handleLoadDemo}
+              seedingDemo={seedingDemo}
             />
           )}
         </section>
@@ -465,9 +517,15 @@ function StatMini({ label, value }: { label: string; value: string }) {
 function EmptyCategory({
   category,
   addHref,
+  showDemoLoader,
+  onLoadDemo,
+  seedingDemo,
 }: {
   category: CategoryWithStats | null | undefined;
   addHref: string;
+  showDemoLoader?: boolean;
+  onLoadDemo?: () => void;
+  seedingDemo?: boolean;
 }) {
   const Icon = category ? getCategoryIcon(category.icon) : AlertCircle;
   return (
@@ -487,12 +545,30 @@ function EmptyCategory({
           ? category.description
           : "Add your first source to teach your agent. Upload a file, paste a URL, or write content directly."}
       </p>
-      <Link href={addHref}>
-        <Button>
-          <Plus className="w-4 h-4" />
-          {category ? `Add to ${category.name}` : "Add source"}
-        </Button>
-      </Link>
+      <div className="flex items-center justify-center gap-3 flex-wrap">
+        <Link href={addHref}>
+          <Button>
+            <Plus className="w-4 h-4" />
+            {category ? `Add to ${category.name}` : "Add source"}
+          </Button>
+        </Link>
+        {showDemoLoader && onLoadDemo && (
+          <Button
+            variant="secondary"
+            onClick={onLoadDemo}
+            disabled={seedingDemo}
+          >
+            <Wand2 className="w-4 h-4" />
+            {seedingDemo ? "Loading demo…" : "Load Acme Cloud demo"}
+          </Button>
+        )}
+      </div>
+      {showDemoLoader && (
+        <p className="text-xs text-sand-500 mt-4 max-w-sm mx-auto">
+          Pre-loads 8 docs from a fictional B2B SaaS so you can try chat,
+          citations, and analytics in 30 seconds.
+        </p>
+      )}
     </motion.div>
   );
 }
