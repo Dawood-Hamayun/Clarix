@@ -2,11 +2,77 @@
 
 import { ChatInterface } from "@/components/chat/chat-interface";
 import { useEffect, useState } from "react";
-import type { KnowledgeSource, SourceCitation } from "@/lib/db/types";
-import { BookOpen, AlertCircle, Target, Loader2 } from "lucide-react";
+import type {
+  Conversation,
+  KnowledgeSource,
+  SourceCitation,
+} from "@/lib/db/types";
+import type { UIMessage } from "ai";
+import type { ChatMessageMetadata } from "@/app/api/chat/route";
+import {
+  BookOpen,
+  AlertCircle,
+  Target,
+  Loader2,
+  RotateCcw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+
+type ChatMessage = UIMessage<ChatMessageMetadata>;
+
+// Scoped to the browser session so navigating between tabs reuses the same
+// server-side conversation (and its full message history). Closing the tab
+// clears it, so every new visit gets a fresh thread.
+const STORAGE_KEY = "clarix:playground:conversationId:proj_demo";
+
+/**
+ * Hydrate the thread the Playground left behind. Returns both the live
+ * conversationId and the persisted messages re-shaped into the UIMessage
+ * format the chat hook expects. Any failure (404, corrupt id, etc.) falls
+ * back to a brand-new conversation.
+ */
+async function loadPlaygroundThread(): Promise<{
+  conversationId: string;
+  initialMessages: ChatMessage[];
+}> {
+  const storedId =
+    typeof window !== "undefined"
+      ? window.sessionStorage.getItem(STORAGE_KEY)
+      : null;
+
+  if (storedId) {
+    try {
+      const res = await fetch(
+        `/api/conversations/${encodeURIComponent(storedId)}`
+      );
+      if (res.ok) {
+        const conv: Conversation = await res.json();
+        return {
+          conversationId: conv.id,
+          initialMessages: conv.messages.map((m) => ({
+            id: m.id,
+            role: m.role,
+            parts: [{ type: "text", text: m.content }],
+            metadata: m.sources ? { sources: m.sources } : undefined,
+          })) as ChatMessage[],
+        };
+      }
+    } catch {
+      /* fall through to create a new conversation */
+    }
+  }
+
+  const created = await fetch("/api/conversations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ projectId: "proj_demo" }),
+  }).then((r) => r.json() as Promise<Conversation>);
+
+  window.sessionStorage.setItem(STORAGE_KEY, created.id);
+  return { conversationId: created.id, initialMessages: [] };
+}
 
 export default function PlaygroundPage() {
   const [sources, setSources] = useState<KnowledgeSource[]>([]);
@@ -16,21 +82,66 @@ export default function PlaygroundPage() {
   const [conversationId, setConversationId] = useState<string | undefined>(
     undefined
   );
+  const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
+  const [hydrating, setHydrating] = useState(true);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("/api/knowledge")
       .then((r) => r.json())
       .then(setSources);
-    // Create a conversation up-front so the very first message gets persisted.
-    fetch("/api/conversations", {
+
+    // Starter questions are generated from the live KB so they're always
+    // answerable — see /api/starter-suggestions. No more "how does this
+    // work?" prompts that send the agent into meta territory.
+    fetch("/api/starter-suggestions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ projectId: "proj_demo" }),
     })
       .then((r) => r.json())
-      .then((conv) => setConversationId(conv.id))
-      .catch(() => {});
+      .then((data) => {
+        if (Array.isArray(data.suggestions)) setSuggestions(data.suggestions);
+      })
+      .catch(() => {
+        /* fall back to empty — EmptyState just hides them */
+      });
+
+    let cancelled = false;
+    loadPlaygroundThread()
+      .then(({ conversationId: id, initialMessages: msgs }) => {
+        if (cancelled) return;
+        setConversationId(id);
+        setInitialMessages(msgs);
+        setHydrating(false);
+      })
+      .catch(() => {
+        if (!cancelled) setHydrating(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const handleStartFresh = async () => {
+    setHydrating(true);
+    window.sessionStorage.removeItem(STORAGE_KEY);
+    try {
+      const created: Conversation = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId: "proj_demo" }),
+      }).then((r) => r.json());
+      window.sessionStorage.setItem(STORAGE_KEY, created.id);
+      setConversationId(created.id);
+      setInitialMessages([]);
+      setRetrieved([]);
+      setLastQuery("");
+    } finally {
+      setHydrating(false);
+    }
+  };
 
   const readySources = sources.filter((s) => s.status === "ready");
   const totalChunks = readySources.reduce(
@@ -58,18 +169,47 @@ export default function PlaygroundPage() {
 
   return (
     <div>
+      {/* Header row: thread controls */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <p className="text-xs uppercase tracking-wide font-bold text-sand-400">
+            Playground
+          </p>
+          <p className="text-sm text-sand-600 mt-0.5">
+            {hydrating
+              ? "Restoring your session…"
+              : initialMessages.length > 0
+                ? `Continuing your session (${initialMessages.length} message${
+                    initialMessages.length === 1 ? "" : "s"
+                  })`
+              : "New session — ask anything to get started"}
+          </p>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleStartFresh}
+          disabled={hydrating}
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+          Start fresh
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chat */}
         <div className="lg:col-span-2">
-          <ChatInterface
-            conversationId={conversationId}
-            suggestions={[
-              "What can you help me with?",
-              "Tell me about the knowledge base",
-              "How does this work?",
-            ]}
-            onUserMessage={handleUserMessage}
-          />
+          {!hydrating && (
+            <ChatInterface
+              conversationId={conversationId}
+              initialMessages={initialMessages}
+              suggestions={suggestions}
+              onUserMessage={handleUserMessage}
+            />
+          )}
+          {hydrating && (
+            <div className="h-[calc(100vh-14rem)] min-h-[480px] bg-white border border-sand-200 rounded-2xl shadow-sand animate-pulse" />
+          )}
         </div>
 
         {/* Sidebar - KB info */}

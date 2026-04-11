@@ -7,6 +7,7 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ sourceId: string }> }
 ) {
+  await store.ready();
   const { sourceId } = await params;
   const source = store.getSource(sourceId);
   if (!source) {
@@ -20,6 +21,7 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ sourceId: string }> }
 ) {
+  await store.ready();
   const { sourceId } = await params;
   const source = store.getSource(sourceId);
   if (!source) {
@@ -49,8 +51,7 @@ export async function PATCH(
         sourceId,
         content,
         source.type,
-        source.projectId,
-        source.metadata.fileType
+        source.projectId
       );
     } catch (error) {
       return NextResponse.json(
@@ -73,6 +74,7 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ sourceId: string }> }
 ) {
+  await store.ready();
   const { sourceId } = await params;
   await vectorStore.deleteBySource(sourceId);
   const deleted = store.deleteSource(sourceId);

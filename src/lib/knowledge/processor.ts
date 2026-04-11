@@ -15,8 +15,7 @@ export async function processSource(
   sourceId: string,
   content: string,
   type: "text" | "url" | "file",
-  projectId: string,
-  fileType?: string
+  projectId: string
 ): Promise<{
   chunkCount: number;
   wordCount: number;
@@ -27,7 +26,7 @@ export async function processSource(
   try {
     // 1. Parse
     store.updateSource(sourceId, { status: "processing" });
-    const parsedText = await parseContent(content, type, fileType);
+    const parsedText = await parseContent(content, type);
 
     // 2. Chunk
     const chunkResults = chunkText(parsedText);
@@ -35,7 +34,7 @@ export async function processSource(
 
     // 3. Embed
     const texts = chunkResults.map((c) => c.content);
-    const embeddings = await generateEmbeddings(texts);
+    const embeddings = await generateEmbeddings(texts, projectId);
 
     // 4. Store chunks and vectors
     const chunkIds: string[] = [];

@@ -80,13 +80,35 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="flex items-start justify-between gap-4"
       >
-        <h1 className="text-3xl font-bold text-sand-900 tracking-tighter">
-          Overview
-        </h1>
-        <p className="text-base text-sand-600 mt-2">
-          How your agent is doing today, and what to improve next.
-        </p>
+        <div>
+          <h1 className="text-3xl font-bold text-sand-900 tracking-tighter">
+            Overview
+          </h1>
+          <p className="text-base text-sand-600 mt-2">
+            How your agent is doing today, and what to improve next.
+          </p>
+        </div>
+
+        {/* Quick actions — compact icon rail, tucked to the top-right. */}
+        <div className="hidden md:flex items-center gap-1.5 bg-white border border-sand-200 rounded-2xl shadow-sand p-1.5">
+          <QuickActionIcon
+            href="/dashboard/knowledge/new"
+            icon={Plus}
+            label="Add knowledge"
+          />
+          <QuickActionIcon
+            href="/dashboard/playground"
+            icon={FlaskConical}
+            label="Test your agent"
+          />
+          <QuickActionIcon
+            href="/dashboard/knowledge"
+            icon={BookOpen}
+            label="Manage knowledge"
+          />
+        </div>
       </motion.div>
 
       {/* Top row: KB health + metric tiles */}
@@ -111,6 +133,13 @@ export default function DashboardPage() {
             label="Resolution rate"
             value={analytics?.resolutionRate ?? 0}
             suffix="%"
+            hint={
+              analytics && analytics.ratedConversations > 0
+                ? `of ${analytics.ratedConversations} rated chat${
+                    analytics.ratedConversations === 1 ? "" : "s"
+                  }`
+                : "No ratings yet"
+            }
           />
           <MetricTile
             icon={Sparkles}
@@ -127,7 +156,7 @@ export default function DashboardPage() {
             title="Recent conversations"
             href="/dashboard/conversations"
           />
-          <div className="bg-white border border-sand-200 rounded-2xl shadow-sand divide-y divide-sand-200 overflow-hidden">
+          <div className="bg-white border border-sand-200 rounded-2xl shadow-sand divide-y divide-sand-200 overflow-hidden max-h-[420px] overflow-y-auto">
             {conversations.length === 0 ? (
               <div className="p-10 text-center">
                 <div className="w-12 h-12 rounded-2xl bg-sand-100 border border-sand-200 flex items-center justify-center mx-auto mb-3">
@@ -166,10 +195,25 @@ export default function DashboardPage() {
                   </div>
                   <Badge
                     variant={
-                      conv.metadata.resolved ? "success" : "processing"
+                      conv.status === "resolved"
+                        ? "success"
+                        : conv.status === "unresolved"
+                          ? "error"
+                          : "processing"
+                    }
+                    title={
+                      conv.status === "resolved"
+                        ? "Customer gave at least one 👍 and no 👎"
+                        : conv.status === "unresolved"
+                          ? "Customer gave at least one 👎 on an answer"
+                          : "No feedback given yet"
                     }
                   >
-                    {conv.metadata.resolved ? "Resolved" : "Active"}
+                    {conv.status === "resolved"
+                      ? "Resolved"
+                      : conv.status === "unresolved"
+                        ? "Unresolved"
+                        : "Unrated"}
                   </Badge>
                 </Link>
               ))
@@ -183,10 +227,11 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Quick actions */}
-      <div>
+      {/* Mobile quick actions — stacked on small screens where the icon
+          rail in the hero is hidden. */}
+      <div className="md:hidden">
         <SectionHeader title="Quick actions" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-3">
           <QuickAction
             href="/dashboard/knowledge/new"
             icon={Plus}
@@ -235,11 +280,14 @@ function MetricTile({
   label,
   value,
   suffix = "",
+  hint,
 }: {
   icon: typeof MessageSquare;
   label: string;
   value: number;
   suffix?: string;
+  /** Optional small caption under the big number — context, not decoration. */
+  hint?: string;
 }) {
   return (
     <motion.div
@@ -254,6 +302,9 @@ function MetricTile({
       <div className="mt-3 text-3xl font-bold text-sand-900 tracking-tighter">
         <AnimatedCounter value={value} suffix={suffix} />
       </div>
+      {hint && (
+        <p className="mt-1 text-[11px] text-sand-400 font-medium">{hint}</p>
+      )}
     </motion.div>
   );
 }
@@ -388,7 +439,7 @@ function GapsPanel({ gaps }: { gaps: KBGap[] }) {
 
   return (
     <div className="relative bg-white border border-sand-200 rounded-2xl shadow-sand overflow-hidden">
-      <div className="max-h-[560px] overflow-y-auto divide-y divide-sand-200">
+      <div className="max-h-[420px] overflow-y-auto divide-y divide-sand-200">
         {gaps.slice(0, 8).map((gap, i) => {
           const Icon = gap.suggestedCategoryName
             ? getCategoryIcon(undefined)
@@ -441,6 +492,30 @@ function GapsPanel({ gaps }: { gaps: KBGap[] }) {
         })}
       </div>
     </div>
+  );
+}
+
+function QuickActionIcon({
+  href,
+  icon: Icon,
+  label,
+}: {
+  href: string;
+  icon: typeof Plus;
+  label: string;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      title={label}
+      className="group relative w-10 h-10 rounded-xl bg-white hover:bg-sand-900 text-sand-600 hover:text-white border border-transparent hover:border-sand-900 flex items-center justify-center transition-all"
+    >
+      <Icon className="w-4 h-4" />
+      <span className="pointer-events-none absolute top-full mt-2 right-0 whitespace-nowrap bg-sand-900 text-white text-[10px] font-semibold tracking-tight px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+        {label}
+      </span>
+    </Link>
   );
 }
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateText } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { getOpenAIProvider, MissingOpenAIKeyError } from "@/lib/ai/client";
 import { store } from "@/lib/db/store";
 import {
   getTemplate,
@@ -29,6 +29,7 @@ interface ComposeBody {
 type Body = StartBody | ComposeBody;
 
 export async function POST(req: Request) {
+  await store.ready();
   const body = (await req.json()) as Body;
   const projectId = body.projectId || "proj_demo";
 
@@ -98,6 +99,19 @@ Category description: ${category.description}
 Here is the raw Q&A from the user. Turn it into a polished Markdown knowledge-base entry following the rules above.
 
 ${qaBlock}`;
+
+    let openai;
+    try {
+      openai = getOpenAIProvider(projectId);
+    } catch (err) {
+      if (err instanceof MissingOpenAIKeyError) {
+        return NextResponse.json(
+          { error: err.message, code: "missing_openai_key" },
+          { status: 400 }
+        );
+      }
+      throw err;
+    }
 
     try {
       const { text } = await generateText({

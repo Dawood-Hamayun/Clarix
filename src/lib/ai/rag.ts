@@ -139,7 +139,7 @@ export async function retrieveContext(
   // Generate embedding for the query
   let queryEmbedding: number[];
   try {
-    queryEmbedding = await generateEmbedding(query);
+    queryEmbedding = await generateEmbedding(query, projectId);
   } catch {
     return {
       systemPrompt: buildSystemPrompt(companyName, [], agentConfig),

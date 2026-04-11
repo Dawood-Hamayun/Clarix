@@ -1,22 +1,39 @@
 import { NextResponse } from "next/server";
 import { store } from "@/lib/db/store";
-import type { Project } from "@/lib/db/types";
+import type { Project, PublicProject } from "@/lib/db/types";
+
+/**
+ * Strip the raw OpenAI key before sending a project to the browser.
+ * Replaces it with a boolean flag the UI can use to decide whether
+ * to show "Add API key" vs. "Key configured".
+ */
+function toPublicProject(project: Project): PublicProject {
+  const { openAIApiKey, ...rest } = project;
+  return {
+    ...rest,
+    hasOpenAIApiKey: Boolean(openAIApiKey && openAIApiKey.trim()),
+  };
+}
 
 export async function GET(req: Request) {
+  await store.ready();
   const { searchParams } = new URL(req.url);
   const projectId = searchParams.get("projectId") || "proj_demo";
   const project = store.getProject(projectId);
   if (!project) {
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
   }
-  return NextResponse.json(project);
+  return NextResponse.json(toPublicProject(project));
 }
 
 export async function PATCH(req: Request) {
+  await store.ready();
   const body = await req.json();
-  const { projectId = "proj_demo", ...updates } = body as Partial<Project> & {
-    projectId?: string;
-  };
+  const {
+    projectId = "proj_demo",
+    openAIApiKey,
+    ...updates
+  } = body as Partial<Project> & { projectId?: string };
 
   const existing = store.getProject(projectId);
   if (!existing) {
@@ -34,8 +51,20 @@ export async function PATCH(req: Request) {
       : existing.agentConfig,
   };
 
+  // Handle the API key separately so:
+  //   - `undefined`  → leave existing key alone
+  //   - `""`         → clear it (user explicitly removed it)
+  //   - "sk-..."     → trim and store
+  if (openAIApiKey !== undefined) {
+    const trimmed = typeof openAIApiKey === "string" ? openAIApiKey.trim() : "";
+    merged.openAIApiKey = trimmed || undefined;
+  }
+
   const updated = store.updateProject(projectId, merged);
-  return NextResponse.json(updated);
+  if (!updated) {
+    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  }
+  return NextResponse.json(toPublicProject(updated));
 }
 
 /**
@@ -43,6 +72,8 @@ export async function PATCH(req: Request) {
  * "Delete project" danger-zone button in settings.
  */
 export async function DELETE() {
+  await store.ready();
   store.resetAll();
+  await store.flushNow();
   return NextResponse.json({ ok: true });
 }

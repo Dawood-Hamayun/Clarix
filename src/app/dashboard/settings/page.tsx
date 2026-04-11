@@ -15,6 +15,7 @@ import {
   KeyRound,
   Building2,
   Sparkles,
+  Gauge,
 } from "lucide-react";
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,7 @@ import { getCategoryIcon } from "@/lib/knowledge/category-icons";
 import type {
   AgentPersonality,
   KnowledgeCategory,
-  Project,
+  PublicProject,
 } from "@/lib/db/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -66,17 +67,24 @@ const PERSONALITIES: {
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [project, setProject] = useState<Project | null>(null);
+  const [project, setProject] = useState<PublicProject | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [savedKey, setSavedKey] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  // API key field state is kept separate from the project object because
+  // the server only ever returns a boolean (`hasOpenAIApiKey`), never the
+  // raw key — so we need a scratch input to let the user paste a new one.
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [showKeyField, setShowKeyField] = useState(false);
+  const [clearingKey, setClearingKey] = useState(false);
+
   useEffect(() => {
     fetch("/api/project")
       .then((r) => r.json())
-      .then((data: Project) => {
+      .then((data: PublicProject) => {
         setProject(data);
         setLoading(false);
       });
@@ -320,23 +328,148 @@ export default function SettingsPage() {
       {/* Categories manager */}
       <CategoriesCard projectId={project.id} />
 
-      {/* API */}
+      {/* OpenAI API key */}
       <Card>
         <div className="flex items-start gap-3">
           <SectionIcon icon={KeyRound} />
           <div className="flex-1">
-            <CardTitle>API key</CardTitle>
+            <CardTitle>OpenAI API key</CardTitle>
             <CardDescription>
-              Your OpenAI API key is configured via environment variables.
+              Clarix uses your own OpenAI key for chat (GPT-4o) and
+              embeddings. It&apos;s stored server-side against this project
+              and never sent back to the browser.
             </CardDescription>
           </div>
+          {project.hasOpenAIApiKey ? (
+            <span className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide bg-status-success/10 text-status-success border border-status-success/20">
+              <Check className="w-3 h-3" />
+              Configured
+            </span>
+          ) : (
+            <span className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide bg-sand-100 text-sand-500 border border-sand-200">
+              Not set
+            </span>
+          )}
         </div>
-        <div className="mt-5">
-          <div className="bg-sand-50 border border-sand-200 rounded-xl px-4 py-3 font-mono text-sm text-sand-500">
-            OPENAI_API_KEY=sk-•••••••••••••••
-          </div>
+
+        <div className="mt-5 space-y-4">
+          {project.hasOpenAIApiKey && !showKeyField ? (
+            <div className="bg-sand-50 border border-sand-200 rounded-xl px-4 py-3 flex items-center gap-3">
+              <div className="font-mono text-sm text-sand-500 flex-1 truncate">
+                sk-••••••••••••••••••••••••
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setShowKeyField(true);
+                  setApiKeyInput("");
+                }}
+              >
+                Replace
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                loading={clearingKey}
+                onClick={async () => {
+                  if (
+                    !confirm(
+                      "Remove the OpenAI key for this project? Chat and ingestion will stop working until you add a new one."
+                    )
+                  )
+                    return;
+                  setClearingKey(true);
+                  const res = await fetch("/api/project", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      projectId: project.id,
+                      openAIApiKey: "",
+                    }),
+                  });
+                  if (res.ok) {
+                    const updated: PublicProject = await res.json();
+                    setProject(updated);
+                  }
+                  setClearingKey(false);
+                }}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Clear
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Input
+                label="Paste your OpenAI API key"
+                placeholder="sk-..."
+                value={apiKeyInput}
+                onChange={(e) => setApiKeyInput(e.target.value)}
+                hint={
+                  <span>
+                    Get one from{" "}
+                    <a
+                      href="https://platform.openai.com/api-keys"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline font-semibold text-sand-800 hover:text-sand-900"
+                    >
+                      platform.openai.com/api-keys
+                    </a>
+                    . You&apos;ll need a paid OpenAI account with credit.
+                  </span>
+                }
+              />
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={async () => {
+                    const trimmed = apiKeyInput.trim();
+                    if (!trimmed) return;
+                    setSaving("apiKey");
+                    const res = await fetch("/api/project", {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        projectId: project.id,
+                        openAIApiKey: trimmed,
+                      }),
+                    });
+                    if (res.ok) {
+                      const updated: PublicProject = await res.json();
+                      setProject(updated);
+                      setApiKeyInput("");
+                      setShowKeyField(false);
+                      setSavedKey("apiKey");
+                      setTimeout(() => setSavedKey(null), 1500);
+                    }
+                    setSaving(null);
+                  }}
+                  loading={saving === "apiKey"}
+                  disabled={!apiKeyInput.trim()}
+                >
+                  <Save className="w-4 h-4" />
+                  {savedKey === "apiKey" ? "Saved!" : "Save key"}
+                </Button>
+                {showKeyField && project.hasOpenAIApiKey && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setShowKeyField(false);
+                      setApiKeyInput("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </Card>
+
+      {/* OpenAI usage */}
+      <UsageCard projectId={project.id} />
 
       {/* Danger */}
       <Card className="border-status-error/30">
@@ -450,6 +583,141 @@ function SaveButton({
           </motion.span>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+/* ---------- Usage card ---------- */
+
+interface UsageSnapshot {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  turns: number;
+  since: string | null;
+  estimatedCostUsd: number;
+}
+
+function UsageCard({ projectId }: { projectId: string }) {
+  const [usage, setUsage] = useState<UsageSnapshot | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/usage?projectId=${encodeURIComponent(projectId)}`)
+      .then((r) => r.json())
+      .then((data: UsageSnapshot) => {
+        if (!cancelled) {
+          setUsage(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId]);
+
+  return (
+    <Card>
+      <div className="flex items-start gap-3">
+        <SectionIcon icon={Gauge} />
+        <div className="flex-1">
+          <CardTitle>OpenAI usage</CardTitle>
+          <CardDescription>
+            Rolling spend on chat for this project. OpenAI doesn&apos;t expose
+            remaining credit to the API, so you&apos;ll need to top up or check
+            balance at{" "}
+            <a
+              href="https://platform.openai.com/account/usage"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-semibold text-sand-800 hover:text-sand-900"
+            >
+              platform.openai.com/account/usage
+            </a>
+            .
+          </CardDescription>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="mt-5 h-24 bg-sand-100 rounded-2xl animate-pulse" />
+      ) : !usage || usage.turns === 0 ? (
+        <div className="mt-5 bg-sand-50 border border-sand-200 rounded-2xl px-4 py-6 text-center">
+          <p className="text-sm text-sand-600">
+            No chat turns tracked yet. Usage will appear after your first
+            message in the Playground or widget.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <UsageStat
+            label="Prompt tokens"
+            value={usage.promptTokens.toLocaleString()}
+          />
+          <UsageStat
+            label="Completion tokens"
+            value={usage.completionTokens.toLocaleString()}
+          />
+          <UsageStat
+            label="Turns"
+            value={usage.turns.toLocaleString()}
+          />
+          <UsageStat
+            label="Est. spend"
+            value={`$${usage.estimatedCostUsd.toFixed(4)}`}
+            highlight
+          />
+        </div>
+      )}
+
+      {usage && usage.since && (
+        <p className="mt-4 text-[11px] text-sand-400 tracking-tight">
+          Since {new Date(usage.since).toLocaleString()} · at published gpt-4o
+          pricing ($2.50 / 1M prompt, $10 / 1M completion)
+        </p>
+      )}
+    </Card>
+  );
+}
+
+function UsageStat({
+  label,
+  value,
+  highlight = false,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border px-4 py-3",
+        highlight
+          ? "bg-sand-900 border-sand-900 text-white"
+          : "bg-sand-50 border-sand-200"
+      )}
+    >
+      <div
+        className={cn(
+          "text-[10px] uppercase tracking-wide font-bold",
+          highlight ? "text-white/70" : "text-sand-400"
+        )}
+      >
+        {label}
+      </div>
+      <div
+        className={cn(
+          "text-xl font-bold tracking-tight mt-1",
+          highlight ? "text-white" : "text-sand-900"
+        )}
+      >
+        {value}
+      </div>
     </div>
   );
 }

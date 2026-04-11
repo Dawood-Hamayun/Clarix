@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils/cn";
-import type { Project, WidgetConfig } from "@/lib/db/types";
+import type { PublicProject, WidgetConfig } from "@/lib/db/types";
 
 const COLOR_OPTIONS = [
   { value: "#1F1B16", label: "Sand" },
@@ -44,7 +44,7 @@ const POSITION_OPTIONS: {
 ];
 
 export default function WidgetPage() {
-  const [project, setProject] = useState<Project | null>(null);
+  const [project, setProject] = useState<PublicProject | null>(null);
   const [config, setConfig] = useState<WidgetConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -54,7 +54,7 @@ export default function WidgetPage() {
   useEffect(() => {
     fetch("/api/project")
       .then((r) => r.json())
-      .then((p: Project) => {
+      .then((p: PublicProject) => {
         setProject(p);
         setConfig(p.widgetConfig);
         setLoading(false);

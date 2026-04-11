@@ -130,11 +130,6 @@ export default function LandingPage() {
               Build your agent <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
-          <Link href="/dashboard">
-            <Button variant="secondary" size="lg">
-              View demo
-            </Button>
-          </Link>
         </motion.div>
       </section>
 

@@ -50,7 +50,7 @@ export default function OnboardingWelcome() {
       // Non-blocking — sessionStorage still has the values
     }
 
-    router.push("/onboarding/knowledge");
+    router.push("/onboarding/api-key");
   };
 
   return (

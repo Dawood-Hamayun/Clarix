@@ -31,16 +31,43 @@
     return; // Can't determine origin — bail.
   }
 
-  // Sizing
+  // Sizing constants. These are the *desktop* targets; on narrow or short
+  // viewports we clamp and switch to a near-fullscreen panel so mobile users
+  // get a usable chat surface instead of a cramped floating card.
   var CLOSED_WIDTH = 260;
   var CLOSED_HEIGHT = 88;
   var OPEN_WIDTH = 400;
   var OPEN_HEIGHT_MAX = 640;
+  var MOBILE_BREAKPOINT = 520;
 
-  function openHeight() {
-    // Leave a little breathing room on small viewports.
-    return Math.min(OPEN_HEIGHT_MAX, window.innerHeight - 24);
+  function isMobile() {
+    return window.innerWidth < MOBILE_BREAKPOINT;
   }
+
+  function closedSize() {
+    // Shrink the launcher footprint on very narrow screens so it doesn't eat
+    // into the customer's UI.
+    if (window.innerWidth < 360) {
+      return { width: 220, height: 80 };
+    }
+    return { width: CLOSED_WIDTH, height: CLOSED_HEIGHT };
+  }
+
+  function openSize() {
+    if (isMobile()) {
+      // Leave a small top gutter so browser chrome / notches don't clip.
+      return {
+        width: window.innerWidth,
+        height: Math.max(360, window.innerHeight - 12),
+      };
+    }
+    return {
+      width: Math.min(OPEN_WIDTH, window.innerWidth - 16),
+      height: Math.min(OPEN_HEIGHT_MAX, window.innerHeight - 24),
+    };
+  }
+
+  var state = "closed"; // "closed" | "open"
 
   var iframe = document.createElement("iframe");
   iframe.id = "clarix-widget-frame";
@@ -54,6 +81,7 @@
     "&position=" +
     encodeURIComponent(position);
 
+  var initialClosed = closedSize();
   var baseStyle = {
     position: "fixed",
     bottom: "0px",
@@ -61,10 +89,10 @@
     background: "transparent",
     "color-scheme": "normal",
     "z-index": "2147483647",
-    transition: "width .28s ease, height .28s ease",
+    transition: "width .28s ease, height .28s ease, left .28s ease, right .28s ease",
     "pointer-events": "auto",
-    width: CLOSED_WIDTH + "px",
-    height: CLOSED_HEIGHT + "px",
+    width: initialClosed.width + "px",
+    height: initialClosed.height + "px",
   };
   if (position === "bottom-left") {
     baseStyle.left = "0px";
@@ -75,6 +103,36 @@
     iframe.style.setProperty(k, baseStyle[k]);
   });
 
+  function applySize() {
+    if (state === "open") {
+      var s = openSize();
+      iframe.style.width = s.width + "px";
+      iframe.style.height = s.height + "px";
+      // On mobile, pin to both edges so the panel spans the full width.
+      if (isMobile()) {
+        iframe.style.left = "0px";
+        iframe.style.right = "0px";
+      } else if (position === "bottom-left") {
+        iframe.style.left = "0px";
+        iframe.style.right = "auto";
+      } else {
+        iframe.style.right = "0px";
+        iframe.style.left = "auto";
+      }
+    } else {
+      var c = closedSize();
+      iframe.style.width = c.width + "px";
+      iframe.style.height = c.height + "px";
+      if (position === "bottom-left") {
+        iframe.style.left = "0px";
+        iframe.style.right = "auto";
+      } else {
+        iframe.style.right = "0px";
+        iframe.style.left = "auto";
+      }
+    }
+  }
+
   function mount() {
     if (!document.body) {
       // DOM not ready yet — defer.
@@ -82,6 +140,7 @@
       return;
     }
     document.body.appendChild(iframe);
+    applySize();
   }
   mount();
 
@@ -93,19 +152,20 @@
     if (!data || data.type !== "clarix") return;
 
     if (data.action === "open") {
-      iframe.style.width = OPEN_WIDTH + "px";
-      iframe.style.height = openHeight() + "px";
+      state = "open";
+      applySize();
     } else if (data.action === "close") {
-      iframe.style.width = CLOSED_WIDTH + "px";
-      iframe.style.height = CLOSED_HEIGHT + "px";
+      state = "closed";
+      applySize();
     }
   });
 
-  // Keep the open-state height responsive to viewport changes.
+  // Keep the iframe sized correctly across orientation changes, soft
+  // keyboard appearance, and breakpoint crossings (e.g. rotating a tablet).
+  var resizeTimer = null;
   window.addEventListener("resize", function () {
-    if (parseInt(iframe.style.width, 10) === OPEN_WIDTH) {
-      iframe.style.height = openHeight() + "px";
-    }
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(applySize, 60);
   });
 
   // Expose a tiny API for programmatic control: window.Clarix.open() / .close()

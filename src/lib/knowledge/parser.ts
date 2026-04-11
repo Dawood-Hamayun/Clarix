@@ -1,7 +1,6 @@
 export async function parseContent(
   content: string,
-  type: "text" | "url" | "file",
-  fileType?: string
+  type: "text" | "url" | "file"
 ): Promise<string> {
   if (type === "text") {
     return content;
@@ -12,8 +11,8 @@ export async function parseContent(
   }
 
   if (type === "file") {
-    // For MVP, handle text-based file content directly
-    // The file content is already extracted on the client side
+    // Files are decoded on the client (see UploadZone) and sent as plain
+    // text so the server never has to deal with binary PDF/Word parsers.
     return content;
   }
 

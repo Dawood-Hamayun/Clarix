@@ -25,6 +25,12 @@ type ChatMessage = UIMessage<ChatMessageMetadata>;
 interface ChatInterfaceProps {
   projectId?: string;
   conversationId?: string;
+  /**
+   * Messages to prefill the chat with on first mount. Used by pages that
+   * hydrate a persisted conversation from the server so users don't lose
+   * their thread when they navigate away and back.
+   */
+  initialMessages?: ChatMessage[];
   suggestions?: string[];
   compact?: boolean;
   onUserMessage?: (text: string) => void;
@@ -38,6 +44,7 @@ interface FeedbackState {
 export function ChatInterface({
   projectId = "proj_demo",
   conversationId,
+  initialMessages,
   suggestions = [],
   compact = false,
   onUserMessage,
@@ -58,8 +65,14 @@ export function ChatInterface({
     [projectId, conversationId]
   );
 
+  // Key the useChat instance on conversationId + initialMessages identity so
+  // switching conversations (or resetting to "fresh") starts with a clean
+  // message list hydrated from the persisted thread.
+  const chatKey = `${conversationId ?? "none"}:${initialMessages?.length ?? 0}`;
   const { messages, sendMessage, status } = useChat<ChatMessage>({
+    id: chatKey,
     transport,
+    messages: initialMessages,
   });
 
   const isSubmitted = status === "submitted";
@@ -171,7 +184,7 @@ export function ChatInterface({
   return (
     <div
       className={`flex flex-col bg-white border border-sand-200 rounded-2xl overflow-hidden shadow-sand ${
-        compact ? "h-[560px]" : "h-[calc(100vh-9rem)] min-h-[640px]"
+        compact ? "h-[560px]" : "h-[calc(100vh-14rem)] min-h-[480px]"
       }`}
     >
       {/* Messages */}

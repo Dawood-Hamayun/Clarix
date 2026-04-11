@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils/cn";
-import { forwardRef, type InputHTMLAttributes } from "react";
+import { forwardRef, type InputHTMLAttributes, type ReactNode } from "react";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
-  hint?: string;
+  hint?: ReactNode;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(

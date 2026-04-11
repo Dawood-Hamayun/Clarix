@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Globe, ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface URLScraperProps {

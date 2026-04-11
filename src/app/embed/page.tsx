@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { MessageSquare, Send, Sparkles, X } from "lucide-react";
-import type { Project, WidgetConfig } from "@/lib/db/types";
+import type { PublicProject, WidgetConfig } from "@/lib/db/types";
 import type { ChatMessageMetadata } from "@/app/api/chat/route";
+import { MarkdownRenderer } from "@/components/ui/markdown-renderer";
 
 type ChatMessage = UIMessage<ChatMessageMetadata>;
 
@@ -24,6 +25,33 @@ export default function EmbedWidgetPage() {
     "bottom-right"
   );
   const [open, setOpen] = useState(false);
+  // Track viewport width so the chat panel collapses nicely on phones.
+  // The loader iframe itself is also sized based on viewport, so we look at
+  // window.innerWidth directly here (the iframe *is* the viewport).
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 520);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // The shared root layout paints the body with the sand-50 background,
+  // which shows up as a white square inside the iframe on customer sites.
+  // Force the embed route to use a transparent html/body so only the
+  // widget shell itself is visible.
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtml = html.style.background;
+    const prevBody = body.style.background;
+    html.style.background = "transparent";
+    body.style.background = "transparent";
+    return () => {
+      html.style.background = prevHtml;
+      body.style.background = prevBody;
+    };
+  }, []);
 
   // Read ?project=... from the URL, then fetch project config.
   useEffect(() => {
@@ -35,7 +63,7 @@ export default function EmbedWidgetPage() {
 
     fetch(`/api/project?projectId=${encodeURIComponent(pid)}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((p: Project | null) => {
+      .then((p: PublicProject | null) => {
         if (p) setConfig(p.widgetConfig);
       })
       .catch(() => {
@@ -81,8 +109,15 @@ export default function EmbedWidgetPage() {
     config?.greeting || "Hi! How can I help you today?";
   const launcherLabel = config?.launcherLabel || "Chat with us";
 
-  const alignClass =
-    position === "bottom-left" ? "items-start" : "items-end";
+  // When the panel is open on mobile we stretch the flex container so the
+  // ChatPanel can fill the whole iframe. Otherwise it hugs the bottom edge
+  // and the corner matching the configured position.
+  const stretch = open && isMobile;
+  const alignClass = stretch
+    ? "items-stretch"
+    : position === "bottom-left"
+      ? "items-start"
+      : "items-end";
 
   return (
     <div
@@ -97,6 +132,7 @@ export default function EmbedWidgetPage() {
           greeting={greeting}
           radiusClass={radiusClass}
           position={position}
+          isMobile={isMobile}
           onClose={() => setOpen(false)}
         />
       ) : (
@@ -165,6 +201,7 @@ function ChatPanel({
   greeting,
   radiusClass,
   position,
+  isMobile,
   onClose,
 }: {
   projectId: string;
@@ -173,23 +210,103 @@ function ChatPanel({
   greeting: string;
   radiusClass: string;
   position: "bottom-right" | "bottom-left";
+  isMobile: boolean;
   onClose: () => void;
 }) {
   void position;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
+  const [conversationId, setConversationId] = useState<string | undefined>(
+    undefined
+  );
+  const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Reuse the same conversationId for the lifetime of the browser session
+  // so closing and reopening the widget (or navigating between pages on the
+  // host site) keeps the chat thread intact. Closing the tab resets it.
+  const storageKey = `clarix:widget:conversationId:${projectId}`;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function bootstrap() {
+      // 1. Try to resume an existing session
+      const storedId =
+        typeof window !== "undefined"
+          ? window.sessionStorage.getItem(storageKey)
+          : null;
+
+      if (storedId) {
+        try {
+          const res = await fetch(
+            `/api/conversations/${encodeURIComponent(storedId)}`
+          );
+          if (res.ok) {
+            const conv = await res.json();
+            if (cancelled) return;
+            setConversationId(conv.id);
+            setInitialMessages(
+              (conv.messages as Array<{
+                id: string;
+                role: "user" | "assistant";
+                content: string;
+                sources?: unknown;
+              }>).map((m) => ({
+                id: m.id,
+                role: m.role,
+                parts: [{ type: "text", text: m.content }],
+              })) as ChatMessage[]
+            );
+            setHydrated(true);
+            return;
+          }
+        } catch {
+          /* fall through */
+        }
+      }
+
+      // 2. Create a fresh one
+      try {
+        const res = await fetch("/api/conversations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectId }),
+        });
+        const conv = await res.json();
+        if (cancelled) return;
+        if (conv?.id) {
+          setConversationId(conv.id);
+          window.sessionStorage.setItem(storageKey, conv.id);
+        }
+      } catch {
+        /* silent — the widget still renders, just no persistence */
+      }
+      setHydrated(true);
+    }
+
+    bootstrap();
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId, storageKey]);
 
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: { projectId },
+        body: { projectId, conversationId },
       }),
-    [projectId]
+    [projectId, conversationId]
   );
 
+  // Key the chat on conversationId so a fresh conversation (or a resumed
+  // one with a different history) gets a clean useChat instance.
+  const chatKey = `${conversationId ?? "pending"}:${initialMessages.length}`;
   const { messages, sendMessage, status } = useChat<ChatMessage>({
+    id: chatKey,
     transport,
+    messages: hydrated ? initialMessages : undefined,
   });
 
   const isLoading = status === "submitted" || status === "streaming";
@@ -208,13 +325,21 @@ function ChatPanel({
     setInput("");
   };
 
+  // On mobile, the loader iframe spans the full viewport width — so we drop
+  // the max-width, the margin, and the rounded corners to get a true
+  // edge-to-edge panel that doesn't look like a floating card on a phone.
   return (
     <div
-      className={`w-full h-full max-w-sm bg-white border border-sand-200 shadow-sand-lg overflow-hidden flex flex-col ${radiusClass}`}
-      style={{
-        maxHeight: "calc(100vh - 32px)",
-        margin: 16,
-      }}
+      className={`bg-white border-sand-200 shadow-sand-lg overflow-hidden flex flex-col ${
+        isMobile
+          ? "w-full h-full border-t"
+          : `w-full h-full max-w-sm border ${radiusClass}`
+      }`}
+      style={
+        isMobile
+          ? { maxHeight: "100vh" }
+          : { maxHeight: "calc(100vh - 32px)", margin: 16 }
+      }
     >
       {/* Header */}
       <div
@@ -340,6 +465,9 @@ function Bubble({
   }
   if (role === "assistant") {
     if (!text) return null;
+    // Strip inline [1] / [2] citation markers — the widget does not render the
+    // source list so they'd just be noise.
+    const clean = text.replace(/\s?\[\d+\]/g, "");
     return (
       <div className="flex items-start gap-2">
         <div
@@ -348,8 +476,8 @@ function Bubble({
         >
           <Sparkles className="w-3.5 h-3.5" style={{ color: primaryColor }} />
         </div>
-        <div className="bg-white border border-sand-200 rounded-2xl rounded-tl-md px-3 py-2 text-xs text-sand-800 leading-relaxed whitespace-pre-wrap max-w-[85%]">
-          {text}
+        <div className="bg-white border border-sand-200 rounded-2xl rounded-tl-md px-3 py-2 text-sand-800 max-w-[85%]">
+          <MarkdownRenderer content={clean} variant="compact" />
         </div>
       </div>
     );

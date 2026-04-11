@@ -5,10 +5,19 @@ import type {
   KnowledgeCategory,
   Chunk,
   Conversation,
+  ConversationStatus,
   AnalyticsData,
   QueryEvent,
   Message,
 } from "./types";
+import {
+  clearSnapshot,
+  isPersistenceEnabled,
+  loadSnapshot,
+  saveSnapshot,
+  type StoreSnapshot,
+} from "./persistence";
+import { vectorStore } from "./vector-store";
 
 const DEFAULT_CATEGORIES: Omit<
   KnowledgeCategory,
@@ -80,8 +89,122 @@ class MemoryStore {
   conversations: Map<string, Conversation> = new Map();
   queryEvents: Map<string, QueryEvent> = new Map();
 
+  // ---- Hydration / persistence plumbing ----
+
+  private hydrationPromise: Promise<void> | null = null;
+  private hydrated = false;
+  private dirty = false;
+  private persistTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor() {
+    // Always seed so sync callers get a valid default state
+    // before the first async hydration returns.
     this.seed();
+  }
+
+  /**
+   * Lazily load the persisted snapshot from Redis the first time any
+   * API route touches the store. Subsequent calls are no-ops.
+   *
+   * Callers must `await store.ready()` at the top of each handler that
+   * reads or writes state.
+   */
+  ready(): Promise<void> {
+    if (this.hydrated) return Promise.resolve();
+    if (!isPersistenceEnabled()) {
+      this.hydrated = true;
+      return Promise.resolve();
+    }
+    if (!this.hydrationPromise) {
+      this.hydrationPromise = loadSnapshot()
+        .then((snapshot) => {
+          if (snapshot) {
+            this.loadSnapshot(snapshot);
+          }
+          this.hydrated = true;
+        })
+        .catch((err) => {
+          console.warn("[store] hydrate failed:", err);
+          this.hydrated = true;
+        });
+    }
+    return this.hydrationPromise;
+  }
+
+  /**
+   * Mark the store dirty and schedule a debounced flush to Redis.
+   * Batches rapid successive mutations (e.g. indexing many chunks)
+   * into a single write.
+   */
+  private scheduleFlush() {
+    if (!isPersistenceEnabled()) return;
+    this.dirty = true;
+    if (this.persistTimer) clearTimeout(this.persistTimer);
+    this.persistTimer = setTimeout(() => {
+      this.persistTimer = null;
+      if (!this.dirty) return;
+      this.dirty = false;
+      const snapshot = this.toSnapshot();
+      // Fire-and-forget — persistence failures must never break the request.
+      saveSnapshot(snapshot).catch((err) => {
+        console.warn("[store] flush failed:", err);
+      });
+    }, 200);
+  }
+
+  /**
+   * Synchronously flush (await the pending write). Used by DELETE
+   * handlers that want to guarantee the write lands before the
+   * response is returned.
+   */
+  async flushNow(): Promise<void> {
+    if (this.persistTimer) {
+      clearTimeout(this.persistTimer);
+      this.persistTimer = null;
+    }
+    if (!this.dirty || !isPersistenceEnabled()) return;
+    this.dirty = false;
+    await saveSnapshot(this.toSnapshot());
+  }
+
+  private toSnapshot(): StoreSnapshot {
+    return {
+      version: 1,
+      projects: Array.from(this.projects.values()),
+      categories: Array.from(this.categories.values()),
+      sources: Array.from(this.sources.values()),
+      chunks: Array.from(this.chunks.values()),
+      conversations: Array.from(this.conversations.values()),
+      queryEvents: Array.from(this.queryEvents.values()),
+    };
+  }
+
+  private loadSnapshot(snapshot: StoreSnapshot) {
+    this.projects = new Map(snapshot.projects.map((p) => [p.id, p]));
+    this.categories = new Map(snapshot.categories.map((c) => [c.id, c]));
+    this.sources = new Map(snapshot.sources.map((s) => [s.id, s]));
+    this.chunks = new Map(snapshot.chunks.map((c) => [c.id, c]));
+    this.conversations = new Map(
+      snapshot.conversations.map((c) => [c.id, c])
+    );
+    this.queryEvents = new Map(
+      snapshot.queryEvents.map((e) => [e.id, e])
+    );
+
+    // Rebuild the in-memory vector index from the persisted chunks so
+    // RAG search works immediately without re-embedding.
+    const entries = snapshot.chunks
+      .filter((c) => Array.isArray(c.embedding) && c.embedding.length > 0)
+      .map((c) => {
+        const source = this.sources.get(c.sourceId);
+        return {
+          chunkId: c.id,
+          sourceId: c.sourceId,
+          projectId: source?.projectId ?? "proj_demo",
+          embedding: c.embedding,
+        };
+      });
+    vectorStore.rebuild(entries);
   }
 
   /**
@@ -96,7 +219,14 @@ class MemoryStore {
     this.chunks.clear();
     this.conversations.clear();
     this.queryEvents.clear();
+    vectorStore.clear();
     this.seed();
+    // Also clear the persisted snapshot so the fresh seed
+    // isn't immediately overwritten by the old data on next hydrate.
+    if (isPersistenceEnabled()) {
+      clearSnapshot().catch(() => {});
+    }
+    this.scheduleFlush();
   }
 
   private seed() {
@@ -145,6 +275,7 @@ class MemoryStore {
     if (!project) return undefined;
     const updated = { ...project, ...updates };
     this.projects.set(id, updated);
+    this.scheduleFlush();
     return updated;
   }
 
@@ -164,7 +295,7 @@ class MemoryStore {
       };
       this.categories.set(category.id, category);
     }
-
+    this.scheduleFlush();
     return project;
   }
 
@@ -187,6 +318,7 @@ class MemoryStore {
       id: `cat_${nanoid(8)}`,
     };
     this.categories.set(category.id, category);
+    this.scheduleFlush();
     return category;
   }
 
@@ -198,6 +330,7 @@ class MemoryStore {
     if (!category) return undefined;
     const updated = { ...category, ...updates };
     this.categories.set(id, updated);
+    this.scheduleFlush();
     return updated;
   }
 
@@ -209,7 +342,9 @@ class MemoryStore {
         this.sources.set(source.id, { ...source, categoryId: undefined });
       }
     }
-    return this.categories.delete(id);
+    const ok = this.categories.delete(id);
+    if (ok) this.scheduleFlush();
+    return ok;
   }
 
   // Knowledge Sources
@@ -251,6 +386,7 @@ class MemoryStore {
       },
     };
     this.sources.set(source.id, source);
+    this.scheduleFlush();
     return source;
   }
 
@@ -266,6 +402,7 @@ class MemoryStore {
       metadata: { ...source.metadata, ...updates.metadata },
     };
     this.sources.set(id, updated);
+    this.scheduleFlush();
     return updated;
   }
 
@@ -275,7 +412,9 @@ class MemoryStore {
     for (const chunkId of source.chunks) {
       this.chunks.delete(chunkId);
     }
-    return this.sources.delete(id);
+    const ok = this.sources.delete(id);
+    if (ok) this.scheduleFlush();
+    return ok;
   }
 
   // Chunks
@@ -291,6 +430,7 @@ class MemoryStore {
 
   addChunk(chunk: Chunk): void {
     this.chunks.set(chunk.id, chunk);
+    this.scheduleFlush();
   }
 
   // Conversations
@@ -306,6 +446,39 @@ class MemoryStore {
 
   getConversation(id: string): Conversation | undefined {
     return this.conversations.get(id);
+  }
+
+  /**
+   * Derive a conversation's status from the thumbs feedback on its
+   * query events. Single source of truth for the "Resolved" pill on
+   * conversation rows and the Resolution-rate metric on the dashboard.
+   *
+   * - ≥1 👍 and 0 👎  → `resolved`
+   * - ≥1 👎           → `unresolved`
+   * - otherwise       → `unrated`
+   */
+  getConversationStatus(conversationId: string): ConversationStatus {
+    let up = 0;
+    let down = 0;
+    for (const e of this.queryEvents.values()) {
+      if (e.conversationId !== conversationId || !e.rating) continue;
+      if (e.rating === "up") up += 1;
+      else down += 1;
+    }
+    if (down > 0) return "unresolved";
+    if (up > 0) return "resolved";
+    return "unrated";
+  }
+
+  /**
+   * Return a conversation with its derived `status` populated. Use this
+   * from API routes so the browser doesn't have to know how resolution
+   * is defined.
+   */
+  getConversationWithStatus(id: string): Conversation | undefined {
+    const conv = this.conversations.get(id);
+    if (!conv) return undefined;
+    return { ...conv, status: this.getConversationStatus(id) };
   }
 
   createConversation(
@@ -325,11 +498,14 @@ class MemoryStore {
       },
     };
     this.conversations.set(conversation.id, conversation);
+    this.scheduleFlush();
     return conversation;
   }
 
   deleteConversation(id: string): boolean {
-    return this.conversations.delete(id);
+    const ok = this.conversations.delete(id);
+    if (ok) this.scheduleFlush();
+    return ok;
   }
 
   addMessage(
@@ -345,6 +521,7 @@ class MemoryStore {
     });
     conv.metadata.lastMessageAt = new Date().toISOString();
     conv.metadata.messageCount = conv.messages.length;
+    this.scheduleFlush();
     return conv;
   }
 
@@ -358,6 +535,7 @@ class MemoryStore {
       createdAt: new Date().toISOString(),
     };
     this.queryEvents.set(event.id, event);
+    this.scheduleFlush();
     return event;
   }
 
@@ -385,6 +563,7 @@ class MemoryStore {
     if (!event) return undefined;
     const updated = { ...event, ...updates };
     this.queryEvents.set(id, updated);
+    this.scheduleFlush();
     return updated;
   }
 
@@ -397,14 +576,72 @@ class MemoryStore {
       );
   }
 
+  /**
+   * Aggregate token usage across all recorded chat turns for a project.
+   * OpenAI doesn't expose remaining credit via key-scoped API calls, so
+   * we surface spend-so-far instead. Cost is a rough estimate using the
+   * publicly documented gpt-4o pricing at the time of writing
+   * ($2.50 / 1M prompt tokens, $10 / 1M completion tokens).
+   */
+  getTokenUsage(projectId: string) {
+    const events = Array.from(this.queryEvents.values()).filter(
+      (e) => e.projectId === projectId && (e.promptTokens || e.completionTokens)
+    );
+
+    let promptTokens = 0;
+    let completionTokens = 0;
+    let earliest: string | null = null;
+    for (const e of events) {
+      promptTokens += e.promptTokens ?? 0;
+      completionTokens += e.completionTokens ?? 0;
+      if (!earliest || new Date(e.createdAt) < new Date(earliest)) {
+        earliest = e.createdAt;
+      }
+    }
+    const totalTokens = promptTokens + completionTokens;
+    const estimatedCostUsd =
+      (promptTokens / 1_000_000) * 2.5 + (completionTokens / 1_000_000) * 10;
+
+    return {
+      projectId,
+      promptTokens,
+      completionTokens,
+      totalTokens,
+      turns: events.length,
+      since: earliest,
+      estimatedCostUsd: Math.round(estimatedCostUsd * 10_000) / 10_000,
+    };
+  }
+
   // Analytics (derived from real data only — no randomness)
   getAnalytics(projectId: string): AnalyticsData {
-    const conversations = this.getConversations(projectId);
-    const resolved = conversations.filter((c) => c.metadata.resolved);
+    // Only count conversations that actually have messages. Empty shells
+    // are created up-front by the playground + embed widget so the first
+    // chat message has somewhere to land — they shouldn't show up in
+    // metrics until the visitor actually says something.
+    const conversations = this.getConversations(projectId).filter(
+      (c) => c.metadata.messageCount > 0
+    );
     const totalMessages = conversations.reduce(
       (sum, c) => sum + c.metadata.messageCount,
       0
     );
+
+    // Resolution is derived from thumbs feedback via `getConversationStatus`
+    // — the single source of truth used by both this metric and the
+    // "Resolved" pill on the conversations list. Conversations with
+    // zero ratings are *excluded* from both numerator and denominator
+    // so the rate isn't diluted by silent lurkers who never reacted
+    // either way. That's a fair "unknown" bucket rather than a
+    // pessimistic "assume failure."
+    let ratedConversations = 0;
+    let resolvedConversations = 0;
+    for (const c of conversations) {
+      const status = this.getConversationStatus(c.id);
+      if (status === "unrated") continue;
+      ratedConversations += 1;
+      if (status === "resolved") resolvedConversations += 1;
+    }
 
     // Messages per day (last 7 days) — strictly real counts, no fake filler
     const days: { date: string; count: number }[] = [];
@@ -425,13 +662,22 @@ class MemoryStore {
       totalConversations: conversations.length,
       totalMessages,
       resolutionRate:
-        conversations.length > 0
-          ? Math.round((resolved.length / conversations.length) * 100)
+        ratedConversations > 0
+          ? Math.round((resolvedConversations / ratedConversations) * 100)
           : 0,
+      ratedConversations,
       messagesPerDay: days,
     };
   }
 }
 
-// Singleton
-export const store = new MemoryStore();
+// Singleton — cached across hot reloads in dev to survive `next dev` rebuilds.
+declare global {
+  var __clarixStore: MemoryStore | undefined;
+}
+
+export const store: MemoryStore =
+  globalThis.__clarixStore ?? new MemoryStore();
+if (process.env.NODE_ENV !== "production") {
+  globalThis.__clarixStore = store;
+}

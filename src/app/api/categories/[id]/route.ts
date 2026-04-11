@@ -5,6 +5,7 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  await store.ready();
   const { id } = await params;
   const existing = store.getCategory(id);
   if (!existing) {
@@ -31,6 +32,7 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  await store.ready();
   const { id } = await params;
   const existing = store.getCategory(id);
   if (!existing) {

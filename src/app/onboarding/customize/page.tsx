@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils/cn";
 import type {
   AgentPersonality,
-  Project,
+  PublicProject,
   WidgetConfig,
 } from "@/lib/db/types";
 
@@ -85,7 +85,7 @@ const POSITION_OPTIONS: {
 
 export default function OnboardingCustomize() {
   const router = useRouter();
-  const [project, setProject] = useState<Project | null>(null);
+  const [project, setProject] = useState<PublicProject | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   // Local form state — initialised from project once it loads
@@ -101,7 +101,7 @@ export default function OnboardingCustomize() {
   useEffect(() => {
     fetch("/api/project")
       .then((r) => r.json())
-      .then((p: Project) => {
+      .then((p: PublicProject) => {
         setProject(p);
         setAgentName(p.agentConfig.agentName || "");
         setPersonality(p.agentConfig.personality || "friendly");

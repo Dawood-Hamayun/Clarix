@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { store } from "@/lib/db/store";
 
 export async function GET(req: Request) {
+  await store.ready();
   const { searchParams } = new URL(req.url);
   const projectId = searchParams.get("projectId") || "proj_demo";
   const sources = store.getSources(projectId);
@@ -9,6 +10,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  await store.ready();
   const {
     name,
     type,

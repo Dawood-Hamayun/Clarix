@@ -30,6 +30,22 @@ class InMemoryVectorStore {
     this.vectors.set(entry.chunkId, entry);
   }
 
+  /**
+   * Rebuild the vector index from an iterable of vector entries.
+   * Called after the store hydrates from Redis so search works
+   * immediately without re-embedding.
+   */
+  rebuild(entries: Iterable<VectorEntry>): void {
+    this.vectors.clear();
+    for (const e of entries) {
+      this.vectors.set(e.chunkId, e);
+    }
+  }
+
+  clear(): void {
+    this.vectors.clear();
+  }
+
   async search(
     queryEmbedding: number[],
     projectId: string,

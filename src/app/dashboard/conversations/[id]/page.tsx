@@ -5,7 +5,32 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowLeft, User, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import type { Conversation } from "@/lib/db/types";
+import type { Conversation, ConversationStatus } from "@/lib/db/types";
+
+const STATUS_PRESENTATION: Record<
+  ConversationStatus,
+  {
+    label: string;
+    variant: "success" | "error" | "processing";
+    title: string;
+  }
+> = {
+  resolved: {
+    label: "Resolved",
+    variant: "success",
+    title: "Customer gave at least one 👍 and no 👎",
+  },
+  unresolved: {
+    label: "Unresolved",
+    variant: "error",
+    title: "Customer gave at least one 👎 on an answer",
+  },
+  unrated: {
+    label: "Unrated",
+    variant: "processing",
+    title: "No feedback given yet",
+  },
+};
 
 export default function ConversationDetailPage({
   params,
@@ -55,11 +80,14 @@ export default function ConversationDetailPage({
             </p>
           </div>
         </div>
-        <Badge
-          variant={conversation.metadata.resolved ? "success" : "processing"}
-        >
-          {conversation.metadata.resolved ? "Resolved" : "Active"}
-        </Badge>
+        {(() => {
+          const s = STATUS_PRESENTATION[conversation.status ?? "unrated"];
+          return (
+            <Badge variant={s.variant} title={s.title}>
+              {s.label}
+            </Badge>
+          );
+        })()}
       </div>
 
       {/* Messages */}

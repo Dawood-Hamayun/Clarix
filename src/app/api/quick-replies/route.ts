@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateText } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { getOpenAIProvider, MissingOpenAIKeyError } from "@/lib/ai/client";
 import { store } from "@/lib/db/store";
 
 interface TurnInput {
@@ -9,6 +9,7 @@ interface TurnInput {
 }
 
 export async function POST(req: Request) {
+  await store.ready();
   const {
     history,
     projectId = "proj_demo",
@@ -25,6 +26,18 @@ export async function POST(req: Request) {
   const dialog = trimmedHistory
     .map((t) => `${t.role === "user" ? "Customer" : "Agent"}: ${t.content}`)
     .join("\n");
+
+  let openai;
+  try {
+    openai = getOpenAIProvider(projectId);
+  } catch (err) {
+    if (err instanceof MissingOpenAIKeyError) {
+      // Quick replies are best-effort garnish — if the project has no key,
+      // silently return no suggestions instead of erroring the chat UI.
+      return NextResponse.json({ suggestions: [] });
+    }
+    throw err;
+  }
 
   try {
     const { text } = await generateText({

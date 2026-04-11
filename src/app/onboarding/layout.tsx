@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils/cn";
 
 const steps = [
   { path: "/onboarding", label: "Welcome" },
+  { path: "/onboarding/api-key", label: "API key" },
   { path: "/onboarding/knowledge", label: "Knowledge" },
   { path: "/onboarding/customize", label: "Customize" },
   { path: "/onboarding/test", label: "Test" },
