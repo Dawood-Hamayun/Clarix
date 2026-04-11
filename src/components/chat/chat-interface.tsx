@@ -14,6 +14,7 @@ import {
   ThumbsDown,
   Search,
   PenLine,
+  RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarkdownRenderer } from "@/components/ui/markdown-renderer";
@@ -34,6 +35,20 @@ interface ChatInterfaceProps {
   suggestions?: string[];
   compact?: boolean;
   onUserMessage?: (text: string) => void;
+  /**
+   * Optional title shown in the chat's top bar. When omitted no header
+   * is rendered.
+   */
+  title?: string;
+  /** Optional subtitle/status text shown beneath the title. */
+  subtitle?: string;
+  /**
+   * Callback for the "Start fresh" button in the chat header. When
+   * omitted the button is hidden.
+   */
+  onStartFresh?: () => void;
+  /** Disables the Start fresh button (e.g. while a new thread is being created). */
+  startFreshDisabled?: boolean;
 }
 
 interface FeedbackState {
@@ -48,6 +63,10 @@ export function ChatInterface({
   suggestions = [],
   compact = false,
   onUserMessage,
+  title,
+  subtitle,
+  onStartFresh,
+  startFreshDisabled,
 }: ChatInterfaceProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
@@ -181,12 +200,42 @@ export function ChatInterface({
     lastMessage?.role === "assistant" &&
     lastMessageText.length === 0;
 
+  const showHeader = Boolean(title || onStartFresh);
+
   return (
     <div
       className={`flex flex-col bg-white border border-sand-200 rounded-2xl overflow-hidden shadow-sand ${
         compact ? "h-[560px]" : "h-[calc(100vh-14rem)] min-h-[480px]"
       }`}
     >
+      {showHeader && (
+        <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-sand-200 bg-white">
+          <div className="min-w-0">
+            {title && (
+              <p className="text-sm font-semibold text-sand-900 tracking-tight truncate">
+                {title}
+              </p>
+            )}
+            {subtitle && (
+              <p className="text-xs text-sand-500 mt-0.5 truncate">
+                {subtitle}
+              </p>
+            )}
+          </div>
+          {onStartFresh && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onStartFresh}
+              disabled={startFreshDisabled}
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Start fresh
+            </Button>
+          )}
+        </div>
+      )}
+
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         {messages.length === 0 ? (
