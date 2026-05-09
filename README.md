@@ -23,6 +23,14 @@ one Next.js app.
 
 </div> 
 
+<p align="center">
+  <img src="./assets/clarix-demo.gif" width="800">
+  <br/>
+  <em>Demo — persona selection → session</em>
+</p>
+
+---
+
 > Most "AI chatbot" demos are Jupyter notebooks. Toy projects. No UI, no
 > persistence, no real RAG. Clarix is the opposite — a deployable
 > multi-tenant SaaS that any team can stand up on Monday and have
