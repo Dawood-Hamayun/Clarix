@@ -19,9 +19,9 @@ one Next.js app.
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?logo=openai)](https://openai.com)
 [![Vercel AI SDK](https://img.shields.io/badge/Vercel%20AI%20SDK-v6-000)](https://sdk.vercel.ai)
 
-[**Live demo**](https://clarix-rouge.vercel.app) · [**Watch the 2-min walkthrough**](#) · [**Self-host in 5 minutes**](#getting-started)
+[**Live demo**](https://clarix-rouge.vercel.app) · [**Self-host in 5 minutes**](#getting-started)
 
-</div>
+</div> 
 
 > Most "AI chatbot" demos are Jupyter notebooks. Toy projects. No UI, no
 > persistence, no real RAG. Clarix is the opposite — a deployable
@@ -90,14 +90,6 @@ shipped as a single Next.js app you can deploy to Vercel in five minutes.
   - analytics.png           — analytics dashboard with conversation chart
   - widget-embed.png        — the embed code snippet on a clean background
 -->
-
-| Dashboard | Knowledge base |
-|-----------|----------------|
-| ![Dashboard](./docs/screenshots/dashboard-overview.png) | ![Knowledge base](./docs/screenshots/knowledge-base.png) |
-
-| Chat with citations | Analytics |
-|---------------------|-----------|
-| ![Chat with citations](./docs/screenshots/chat-citations.png) | ![Analytics](./docs/screenshots/analytics.png) |
 
 <br />
 
@@ -254,7 +246,7 @@ Upstash Redis (optional).
 - Admin dashboards with actual analytics, not vanity metrics
 - End-to-end products from idea to deployed Vercel URL
 
-[**Live demo**](https://clarix-rouge.vercel.app) · [**Hire me on Upwork**](https://www.upwork.com/freelancers/~01ed40c9bf32f0bdf3) · [**See more work**](https://mydesigndude.com)
+[**Live demo**](https://clarix-rouge.vercel.app) · [**See more work**](https://mydesigndude.com)
 
 <br />
 
