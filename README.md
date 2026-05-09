@@ -26,7 +26,6 @@ one Next.js app.
 <p align="center">
   <img src="./assets/clarix-demo.gif" width="800">
   <br/>
-  <em>Demo — persona selection → session</em>
 </p>
 
 ---
