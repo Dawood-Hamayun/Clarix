@@ -65,16 +65,16 @@ export default function ConversationDetailPage({
         All conversations
       </Link>
 
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-sand-200 flex items-center justify-center text-sm font-medium text-sand-600">
+      <div className="flex items-start sm:items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-full bg-sand-200 flex items-center justify-center text-sm font-medium text-sand-600 shrink-0">
             {(conversation.metadata.customerName || "U")[0]}
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-sand-900">
+          <div className="min-w-0">
+            <h2 className="text-base sm:text-lg font-semibold text-sand-900 truncate">
               {conversation.metadata.customerName || "Customer"}
             </h2>
-            <p className="text-xs text-sand-500">
+            <p className="text-xs text-sand-500 truncate">
               {new Date(conversation.metadata.startedAt).toLocaleString()} &middot;{" "}
               {conversation.metadata.messageCount} messages
             </p>
@@ -91,7 +91,7 @@ export default function ConversationDetailPage({
       </div>
 
       {/* Messages */}
-      <div className="space-y-4 bg-white border border-sand-200 rounded-xl p-6">
+      <div className="space-y-4 bg-white border border-sand-200 rounded-xl p-4 sm:p-6">
         {conversation.messages.map((message, i) => (
           <motion.div
             key={message.id}
@@ -115,8 +115,8 @@ export default function ConversationDetailPage({
                 <Sparkles className="w-4 h-4 text-warm-orange" />
               )}
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <span className="text-sm font-medium text-sand-800">
                   {message.role === "user"
                     ? conversation.metadata.customerName || "Customer"
@@ -126,7 +126,7 @@ export default function ConversationDetailPage({
                   {new Date(message.timestamp).toLocaleTimeString()}
                 </span>
               </div>
-              <p className="text-sm text-sand-700 leading-relaxed">
+              <p className="text-sm text-sand-700 leading-relaxed break-words">
                 {message.content}
               </p>
             </div>

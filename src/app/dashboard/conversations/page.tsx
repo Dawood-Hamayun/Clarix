@@ -97,7 +97,7 @@ export default function ConversationsPage() {
             />
           </div>
 
-          <div className="flex items-center gap-1 bg-white border border-sand-200 rounded-xl p-1">
+          <div className="flex items-center gap-1 bg-white border border-sand-200 rounded-xl p-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <FilterPill
               active={statusFilter === "all"}
               onClick={() => setStatusFilter("all")}
@@ -188,10 +188,10 @@ export default function ConversationsPage() {
                         >
                           <Link
                             href={`/dashboard/conversations/${conv.id}`}
-                            className="flex items-center justify-between gap-4 p-5 hover:bg-sand-50 transition-colors"
+                            className="flex items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 hover:bg-sand-50 transition-colors"
                           >
                             <div className="flex items-center gap-3 min-w-0 flex-1">
-                              <div className="w-10 h-10 rounded-full bg-sand-100 border border-sand-200 flex items-center justify-center text-sm font-bold text-sand-700 shrink-0">
+                              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-sand-100 border border-sand-200 flex items-center justify-center text-sm font-bold text-sand-700 shrink-0">
                                 {(conv.metadata.customerName || "U")[0].toUpperCase()}
                               </div>
                               <div className="min-w-0 flex-1">
@@ -199,7 +199,7 @@ export default function ConversationsPage() {
                                   <p className="text-[0.9375rem] font-semibold text-sand-900 truncate">
                                     {conv.metadata.customerName || "Customer"}
                                   </p>
-                                  <span className="text-xs text-sand-400">
+                                  <span className="text-xs text-sand-400 shrink-0">
                                     {formatTime(conv.metadata.lastMessageAt)}
                                   </span>
                                 </div>
@@ -208,8 +208,8 @@ export default function ConversationsPage() {
                                 </p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-3 shrink-0">
-                              <span className="text-xs font-mono text-sand-500">
+                            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                              <span className="hidden sm:inline text-xs font-mono text-sand-500">
                                 {conv.metadata.messageCount} msgs
                               </span>
                               <StatusBadge status={conv.status ?? "unrated"} />
@@ -225,7 +225,7 @@ export default function ConversationsPage() {
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
               <p className="text-xs text-sand-500 tracking-tight">
                 Showing{" "}
                 <span className="font-semibold text-sand-700">

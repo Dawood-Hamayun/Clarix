@@ -128,17 +128,17 @@ export default function KnowledgePage() {
         transition={{ duration: 0.4 }}
         className="mb-8"
       >
-        <div className="flex items-end justify-between gap-6 flex-wrap">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-6 sm:flex-wrap">
           <div>
-            <h1 className="text-3xl font-bold text-sand-900 tracking-tighter">
+            <h1 className="text-2xl sm:text-3xl font-bold text-sand-900 tracking-tighter">
               Knowledge Base
             </h1>
-            <p className="text-base text-sand-600 mt-2 max-w-xl">
+            <p className="text-sm sm:text-base text-sand-600 mt-2 max-w-xl">
               Organize what your agent knows. Structured categories lead to
               sharper, more reliable answers.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <KBGuideButton />
             {sources.length === 0 && !loading && (
               <Button
@@ -166,7 +166,7 @@ export default function KnowledgePage() {
         )}
 
         {/* Stat strip */}
-        <div className="grid grid-cols-3 gap-4 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-6 sm:mt-8">
           <StatTile
             icon={<Layers className="w-4 h-4" />}
             label="Sources"
@@ -194,12 +194,43 @@ export default function KnowledgePage() {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-[260px_1fr] gap-8">
-        {/* Category sidebar */}
-        <aside className="space-y-1">
-          <p className="text-xs font-semibold text-sand-500 uppercase tracking-wide px-3 mb-2">
+      <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] lg:grid-cols-[260px_1fr] gap-6 md:gap-8">
+        {/* Category sidebar — on mobile it scrolls horizontally so the source
+            list stays the focal point; on tablet+ it's a sticky left rail. */}
+        <aside className="md:space-y-1 -mx-4 sm:mx-0">
+          <p className="hidden md:block text-xs font-semibold text-sand-500 uppercase tracking-wide px-3 mb-2">
             Categories
           </p>
+          <div className="md:hidden flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <MobileCategoryPill
+              name="All"
+              count={sources.length}
+              active={selected === ALL_CATEGORIES_ID}
+              onClick={() => setSelected(ALL_CATEGORIES_ID)}
+              iconName="BookOpen"
+            />
+            {categories.map((cat) => (
+              <MobileCategoryPill
+                key={cat.id}
+                name={cat.name}
+                count={cat.stats.sourceCount}
+                active={selected === cat.id}
+                onClick={() => setSelected(cat.id)}
+                iconName={cat.icon}
+              />
+            ))}
+            {uncategorized.length > 0 && (
+              <MobileCategoryPill
+                name="Uncategorized"
+                count={uncategorized.length}
+                active={selected === UNCATEGORIZED_ID}
+                onClick={() => setSelected(UNCATEGORIZED_ID)}
+                iconName="Folder"
+                warn
+              />
+            )}
+          </div>
+          <div className="hidden md:block space-y-1">
 
           <CategoryItem
             id={ALL_CATEGORIES_ID}
@@ -236,6 +267,7 @@ export default function KnowledgePage() {
               warn
             />
           )}
+          </div>
         </aside>
 
         {/* Main column */}
@@ -300,7 +332,7 @@ export default function KnowledgePage() {
             </div>
           ) : filteredSources.length > 0 ? (
             <div className="relative">
-              <div className="max-h-[calc(100vh-22rem)] min-h-[420px] overflow-y-auto pr-2 -mr-2">
+              <div className="md:max-h-[calc(100vh-22rem)] md:min-h-[420px] md:overflow-y-auto md:pr-2 md:-mr-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-2">
                   {filteredSources.map((source, i) => (
                     <SourceCard
@@ -372,6 +404,46 @@ function StatTile({
       </div>
       <div className="text-sm text-sand-500 mt-0.5">{sub}</div>
     </div>
+  );
+}
+
+function MobileCategoryPill({
+  name,
+  count,
+  active,
+  onClick,
+  iconName,
+  warn,
+}: {
+  name: string;
+  count: number;
+  active: boolean;
+  onClick: () => void;
+  iconName: string;
+  warn?: boolean;
+}) {
+  const Icon = getCategoryIcon(iconName);
+  return (
+    <button
+      onClick={onClick}
+      className={`shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-xl border whitespace-nowrap text-sm font-semibold tracking-tight transition-colors ${
+        active
+          ? "bg-sand-900 text-white border-sand-900"
+          : warn
+          ? "bg-white text-sand-700 border-status-warning/30"
+          : "bg-white text-sand-700 border-sand-200 hover:border-sand-400"
+      }`}
+    >
+      <Icon className="w-4 h-4 shrink-0" />
+      {name}
+      <span
+        className={`text-[10px] font-mono rounded px-1.5 py-0.5 ${
+          active ? "bg-white/20" : "bg-sand-100 text-sand-500"
+        }`}
+      >
+        {count}
+      </span>
+    </button>
   );
 }
 
@@ -461,31 +533,35 @@ function CategoryHeader({
   const { sourceCount, readyCount, wordCount, chunkCount } = category.stats;
 
   return (
-    <div className="bg-white border border-sand-200 rounded-2xl p-6 shadow-sand">
-      <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl bg-sand-900 text-white flex items-center justify-center shrink-0">
-          <Icon className="w-5 h-5" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-2xl font-bold text-sand-900 tracking-tight">
-              {category.name}
-            </h2>
-            {category.system && (
-              <Badge variant="outline">System</Badge>
-            )}
+    <div className="bg-white border border-sand-200 rounded-2xl p-5 sm:p-6 shadow-sand">
+      <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+        <div className="flex items-start gap-4 flex-1 min-w-0">
+          <div className="w-12 h-12 rounded-xl bg-sand-900 text-white flex items-center justify-center shrink-0">
+            <Icon className="w-5 h-5" />
           </div>
-          <p className="text-sand-600 mt-1">{category.description}</p>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-xl sm:text-2xl font-bold text-sand-900 tracking-tight">
+                {category.name}
+              </h2>
+              {category.system && (
+                <Badge variant="outline">System</Badge>
+              )}
+            </div>
+            <p className="text-sand-600 mt-1 text-sm sm:text-base">
+              {category.description}
+            </p>
+          </div>
         </div>
-        <Link href={addHref}>
-          <Button variant="secondary" size="sm">
+        <Link href={addHref} className="shrink-0">
+          <Button variant="secondary" size="sm" className="w-full sm:w-auto">
             <Plus className="w-4 h-4" />
-            Add to {category.name}
+            <span className="truncate">Add to {category.name}</span>
           </Button>
         </Link>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mt-5 pt-5 border-t border-sand-200">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-5 pt-5 border-t border-sand-200">
         <StatMini label="Sources" value={sourceCount.toString()} />
         <StatMini label="Ready" value={`${readyCount} / ${sourceCount}`} />
         <StatMini

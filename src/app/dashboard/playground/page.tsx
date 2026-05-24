@@ -176,7 +176,7 @@ export default function PlaygroundPage() {
 
   return (
     <div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         {/* Chat */}
         <div className="lg:col-span-2">
           {!hydrating && (
@@ -192,7 +192,7 @@ export default function PlaygroundPage() {
             />
           )}
           {hydrating && (
-            <div className="h-[calc(100vh-14rem)] min-h-[480px] bg-white border border-sand-200 rounded-2xl shadow-sand animate-pulse" />
+            <div className="h-[calc(100vh-10rem)] sm:h-[calc(100vh-14rem)] min-h-[480px] bg-white border border-sand-200 rounded-2xl shadow-sand animate-pulse" />
           )}
         </div>
 
@@ -201,9 +201,9 @@ export default function PlaygroundPage() {
             with each question. The static "How it works" rationale and
             the KB summary live below so they don't push real-time
             information off screen. */}
-        <div className="flex flex-col gap-4 h-[calc(100vh-14rem)] min-h-[480px]">
+        <div className="flex flex-col gap-4 lg:h-[calc(100vh-14rem)] lg:min-h-[480px]">
           {/* 1. Retrieved sources — primary, flex-1 */}
-          <div className="bg-sand-100 border border-sand-200 rounded-xl overflow-hidden flex-1 min-h-0 flex flex-col">
+          <div className="bg-sand-100 border border-sand-200 rounded-xl overflow-hidden lg:flex-1 lg:min-h-0 flex flex-col min-h-[260px]">
             <div className="px-5 pt-5 pb-3 shrink-0">
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-warm-orange" />
@@ -227,7 +227,7 @@ export default function PlaygroundPage() {
               )}
             </div>
 
-            <div className="px-5 pb-5 flex-1 min-h-0 overflow-y-auto">
+            <div className="px-5 pb-5 flex-1 lg:min-h-0 overflow-y-auto">
               <AnimatePresence mode="wait">
                 {retrieved.length > 0 ? (
                   <motion.div

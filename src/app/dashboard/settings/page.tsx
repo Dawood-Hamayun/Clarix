@@ -134,17 +134,17 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 md:space-y-10">
       {/* Hero */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="text-3xl font-bold text-sand-900 tracking-tighter">
+        <h1 className="text-2xl sm:text-3xl font-bold text-sand-900 tracking-tighter">
           Settings
         </h1>
-        <p className="text-base text-sand-600 mt-2 max-w-xl">
+        <p className="text-sm sm:text-base text-sand-600 mt-2 max-w-xl">
           Manage your project, agent identity, and knowledge categories. Every
           change is saved to the current project.
         </p>
@@ -454,9 +454,9 @@ export default function SettingsPage() {
 
       {/* OpenAI API key */}
       <Card>
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 flex-wrap">
           <SectionIcon icon={KeyRound} />
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <CardTitle>OpenAI API key</CardTitle>
             <CardDescription>
               Clarix uses your own OpenAI key for chat (GPT-4o) and
@@ -478,8 +478,8 @@ export default function SettingsPage() {
 
         <div className="mt-5 space-y-4">
           {project.hasOpenAIApiKey && !showKeyField ? (
-            <div className="bg-sand-50 border border-sand-200 rounded-xl px-4 py-3 flex items-center gap-3">
-              <div className="font-mono text-sm text-sand-500 flex-1 truncate">
+            <div className="bg-sand-50 border border-sand-200 rounded-xl px-4 py-3 flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+              <div className="font-mono text-sm text-sand-500 flex-1 min-w-0 truncate">
                 sk-••••••••••••••••••••••••
               </div>
               <Button
@@ -917,9 +917,9 @@ function CategoriesCard({ projectId }: { projectId: string }) {
 
   return (
     <Card>
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 flex-wrap">
         <SectionIcon icon={Sparkles} />
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <CardTitle>Knowledge categories</CardTitle>
           <CardDescription>
             Categories group related sources by intent. Create custom ones for
@@ -931,6 +931,7 @@ function CategoriesCard({ projectId }: { projectId: string }) {
             variant="secondary"
             size="sm"
             onClick={() => setCreating(true)}
+            className="shrink-0"
           >
             <FolderPlus className="w-4 h-4" />
             New category
@@ -1006,20 +1007,20 @@ function CategoriesCard({ projectId }: { projectId: string }) {
                   </div>
 
                   {isEditing ? (
-                    <div className="flex-1 flex items-center gap-2">
+                    <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-2 min-w-0">
                       <input
                         autoFocus
                         type="text"
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
-                        className="flex-1 bg-white border border-sand-300 rounded-lg px-2.5 py-1.5 text-sm focus:border-sand-900 focus:outline-none"
+                        className="flex-1 min-w-0 bg-white border border-sand-300 rounded-lg px-2.5 py-1.5 text-sm focus:border-sand-900 focus:outline-none"
                       />
                       <input
                         type="text"
                         value={editDescription}
                         onChange={(e) => setEditDescription(e.target.value)}
                         placeholder="description"
-                        className="flex-1 bg-white border border-sand-300 rounded-lg px-2.5 py-1.5 text-sm focus:border-sand-900 focus:outline-none"
+                        className="flex-1 min-w-0 bg-white border border-sand-300 rounded-lg px-2.5 py-1.5 text-sm focus:border-sand-900 focus:outline-none"
                       />
                     </div>
                   ) : (

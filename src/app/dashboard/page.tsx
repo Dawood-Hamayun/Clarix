@@ -74,7 +74,7 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 md:space-y-10">
       {/* Hero */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -83,10 +83,10 @@ export default function DashboardPage() {
         className="flex items-start justify-between gap-4"
       >
         <div>
-          <h1 className="text-3xl font-bold text-sand-900 tracking-tighter">
+          <h1 className="text-2xl sm:text-3xl font-bold text-sand-900 tracking-tighter">
             Overview
           </h1>
-          <p className="text-base text-sand-600 mt-2">
+          <p className="text-sm sm:text-base text-sand-600 mt-2">
             How your agent is doing today, and what to improve next.
           </p>
         </div>
@@ -112,12 +112,12 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Top row: KB health + metric tiles */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="lg:col-span-1">
           <KBHealthCard report={health} />
         </div>
 
-        <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <MetricTile
             icon={MessageSquare}
             label="Conversations"
@@ -150,7 +150,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Second row: conversations + gaps */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="lg:col-span-2">
           <SectionHeader
             title="Recent conversations"
