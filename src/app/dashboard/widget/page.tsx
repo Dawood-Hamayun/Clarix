@@ -109,7 +109,7 @@ export default function WidgetPage() {
 
   if (loading || !project || !config) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         {[1, 2].map((i) => (
           <div
             key={i}
@@ -124,7 +124,7 @@ export default function WidgetPage() {
     setConfig({ ...config, ...patch });
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
       {/* Configuration */}
       <div className="space-y-6">
         <Card>
@@ -322,7 +322,7 @@ export default function WidgetPage() {
             <motion.div
               layout
               className={cn(
-                "w-72 bg-white shadow-sand-lg border border-sand-200 overflow-hidden mb-3",
+                "w-64 sm:w-72 max-w-[calc(100vw-3rem)] bg-white shadow-sand-lg border border-sand-200 overflow-hidden mb-3",
                 radiusClass
               )}
             >

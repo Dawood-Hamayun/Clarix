@@ -140,17 +140,21 @@ function NewKnowledgeInner() {
         Back to Knowledge Base
       </Link>
 
-      <div className="flex items-start justify-between gap-6 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-sand-900 tracking-tighter mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-sand-900 tracking-tighter mb-2">
             Add Knowledge Source
           </h1>
-          <p className="text-base text-sand-600 max-w-xl">
+          <p className="text-sm sm:text-base text-sand-600 max-w-xl">
             Teach your AI agent by adding structured content. Pick a category
             so answers stay grounded and easy to improve later.
           </p>
         </div>
-        {!processing && !interviewing && <KBGuideButton />}
+        {!processing && !interviewing && (
+          <div className="shrink-0">
+            <KBGuideButton />
+          </div>
+        )}
       </div>
 
       {interviewing && activeCategory ? (
@@ -207,22 +211,22 @@ function NewKnowledgeInner() {
               type="button"
               onClick={() => setInterviewing(true)}
               whileHover={{ y: -2 }}
-              className="w-full mb-8 group relative overflow-hidden bg-sand-900 text-white rounded-2xl p-6 text-left shadow-sand-md hover:shadow-sand-lg transition-shadow"
+              className="w-full mb-8 group relative overflow-hidden bg-sand-900 text-white rounded-2xl p-5 sm:p-6 text-left shadow-sand-md hover:shadow-sand-lg transition-shadow"
             >
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-4 sm:gap-5">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold tracking-tight">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-base sm:text-lg font-bold tracking-tight">
                       Guide me — I&apos;ll interview you
                     </span>
                     <span className="text-[0.6875rem] font-bold uppercase tracking-wide bg-white/15 px-2 py-0.5 rounded-full">
                       Recommended
                     </span>
                   </div>
-                  <p className="text-sm text-white/70 mt-1">
+                  <p className="text-xs sm:text-sm text-white/70 mt-1">
                     Answer a few short questions about{" "}
                     <span className="font-semibold text-white">
                       {activeCategory.name}
@@ -230,7 +234,7 @@ function NewKnowledgeInner() {
                     and I&apos;ll draft a clean, structured entry for you.
                   </p>
                 </div>
-                <ArrowRight className="w-5 h-5 opacity-70 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
+                <ArrowRight className="hidden sm:block w-5 h-5 opacity-70 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
               </div>
             </motion.button>
           )}
@@ -248,7 +252,7 @@ function NewKnowledgeInner() {
           <label className="text-sm font-semibold text-sand-800 tracking-tight mb-3 block">
             Source type
           </label>
-          <div className="grid grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
             {typeOptions.map((opt) => (
               <motion.button
                 key={opt.type}

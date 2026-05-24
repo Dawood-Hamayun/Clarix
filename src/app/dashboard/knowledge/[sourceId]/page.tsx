@@ -124,10 +124,10 @@ export default function SourceDetailPage({
       </Link>
 
       {/* Header */}
-      <div className="bg-white border border-sand-200 rounded-xl p-6 mb-4 shadow-sand">
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="flex items-start gap-4 flex-1 min-w-0">
-            <div className="w-11 h-11 rounded-lg bg-warm-orange-light flex items-center justify-center shrink-0">
+      <div className="bg-white border border-sand-200 rounded-xl p-4 sm:p-6 mb-4 shadow-sand">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
+          <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-warm-orange-light flex items-center justify-center shrink-0">
               <Icon className="w-5 h-5 text-warm-orange" />
             </div>
             <div className="flex-1 min-w-0">
@@ -138,7 +138,7 @@ export default function SourceDetailPage({
                   className="w-full bg-sand-50 border border-sand-200 rounded-lg px-3 py-1.5 text-base font-semibold text-sand-900 focus:outline-none focus:border-warm-orange focus:ring-1 focus:ring-warm-orange-light transition-all"
                 />
               ) : (
-                <h1 className="text-lg font-semibold text-sand-900 truncate">
+                <h1 className="text-base sm:text-lg font-semibold text-sand-900 break-words">
                   {source.name}
                 </h1>
               )}
@@ -165,7 +165,7 @@ export default function SourceDetailPage({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
             {mode === "view" ? (
               <>
                 <Button
@@ -231,7 +231,7 @@ export default function SourceDetailPage({
       </div>
 
       {/* Content area */}
-      <div className="bg-white border border-sand-200 rounded-xl p-6 shadow-sand min-h-[300px]">
+      <div className="bg-white border border-sand-200 rounded-xl p-4 sm:p-6 shadow-sand min-h-[300px]">
         <AnimatePresence mode="wait">
           {mode === "view" ? (
             <motion.div

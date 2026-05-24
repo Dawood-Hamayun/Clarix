@@ -248,7 +248,7 @@ export default function IntegrationsPage() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 md:space-y-10">
       {/* Hero */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -259,10 +259,10 @@ export default function IntegrationsPage() {
           <Plug className="w-3.5 h-3.5" />
           Integrations
         </div>
-        <h1 className="text-3xl font-bold text-sand-900 tracking-tighter">
+        <h1 className="text-2xl sm:text-3xl font-bold text-sand-900 tracking-tighter">
           Ship Clarix anywhere
         </h1>
-        <p className="text-base text-sand-600 mt-2 max-w-2xl">
+        <p className="text-sm sm:text-base text-sand-600 mt-2 max-w-2xl">
           One script tag powers the entire chat widget — launcher, chat panel,
           streaming, and persistence. Pick your stack and paste the snippet.
           It&apos;s already wired to your live project.
@@ -271,11 +271,11 @@ export default function IntegrationsPage() {
 
       {/* Framework tiles */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
           <h2 className="text-sm font-bold text-sand-800 tracking-tight uppercase">
             Frameworks &amp; hosts
           </h2>
-          <span className="text-xs text-sand-500">
+          <span className="text-xs text-sand-500 truncate">
             Workspace:{" "}
             <span className="font-semibold text-sand-700">
               {project?.widgetConfig.companyName || project?.name || "Your workspace"}
@@ -336,7 +336,7 @@ export default function IntegrationsPage() {
         transition={{ duration: 0.2 }}
       >
         <Card>
-          <div className="flex items-start gap-3 mb-4">
+          <div className="flex items-start gap-3 mb-4 flex-wrap sm:flex-nowrap">
             <div className="w-10 h-10 rounded-xl bg-sand-900 text-white flex items-center justify-center shrink-0">
               <active.icon className="w-4 h-4" />
             </div>
@@ -347,7 +347,7 @@ export default function IntegrationsPage() {
             <button
               onClick={() => handleCopy(active.id, snippet)}
               className={cn(
-                "shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer",
+                "shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ml-auto sm:ml-0",
                 copiedId === active.id
                   ? "bg-status-success/10 border-status-success/30 text-status-success"
                   : "bg-white border-sand-200 text-sand-700 hover:bg-sand-50"
@@ -394,7 +394,7 @@ export default function IntegrationsPage() {
       </motion.div>
 
       {/* Programmatic API */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card>
           <CardTitle>Programmatic control</CardTitle>
           <CardDescription>

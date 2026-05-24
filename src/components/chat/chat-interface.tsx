@@ -205,7 +205,7 @@ export function ChatInterface({
   return (
     <div
       className={`flex flex-col bg-white border border-sand-200 rounded-2xl overflow-hidden shadow-sand ${
-        compact ? "h-[560px]" : "h-[calc(100vh-14rem)] min-h-[480px]"
+        compact ? "h-[560px]" : "h-[calc(100vh-10rem)] sm:h-[calc(100vh-14rem)] min-h-[480px]"
       }`}
     >
       {showHeader && (
