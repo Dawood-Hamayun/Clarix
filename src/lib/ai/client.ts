@@ -1,19 +1,33 @@
-import OpenAI from "openai";
 import { createOpenAI, type OpenAIProvider } from "@ai-sdk/openai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import type { EmbeddingModel, LanguageModel } from "ai";
 import { store } from "@/lib/db/store";
 
 /**
- * Central resolver for the OpenAI API key.
+ * Provider-neutral model resolver.
  *
  * Precedence:
- *   1. The key stored on the project during onboarding (preferred — lets
- *      users bring their own key without touching server env).
- *   2. `OPENAI_API_KEY` from the environment (useful for self-hosters
- *      running a single-tenant instance).
+ *   1. `GEMINI_API_KEY` (or `GOOGLE_GENERATIVE_AI_API_KEY`) from the
+ *      environment. When set, the whole app runs on Google's free-tier
+ *      Gemini models. Nothing about the provider is shown in the UI.
+ *   2. The OpenAI key stored on the project during onboarding.
+ *   3. `OPENAI_API_KEY` from the environment.
  *
- * Returns `null` if no key is available so callers can render a friendly
- * "add your API key" prompt instead of throwing a 500.
+ * Model ids are overridable via env so the host can pin whatever the
+ * current free tier offers:
+ *   CLARIX_CHAT_MODEL       (default gemini-2.0-flash  / gpt-4o)
+ *   CLARIX_FAST_MODEL       (default gemini-2.0-flash-lite / gpt-4o-mini)
+ *   CLARIX_EMBEDDING_MODEL  (default text-embedding-004 / text-embedding-3-small)
  */
+
+export function resolveGeminiKey(): string | null {
+  return (
+    process.env.GEMINI_API_KEY?.trim() ||
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() ||
+    null
+  );
+}
+
 export function resolveOpenAIKey(projectId: string): string | null {
   const project = store.getProject(projectId);
   const projectKey = project?.openAIApiKey?.trim();
@@ -23,31 +37,26 @@ export function resolveOpenAIKey(projectId: string): string | null {
   return null;
 }
 
-/** Thrown when a request needs an OpenAI key but none is configured. */
+/** Thrown when a request needs an AI key but none is configured. */
 export class MissingOpenAIKeyError extends Error {
   constructor() {
     super(
-      "No OpenAI API key configured for this project. Add one in Settings → API key, or set OPENAI_API_KEY in your environment."
+      "No AI API key configured. Set GEMINI_API_KEY in your environment, add an OpenAI key in Settings, or set OPENAI_API_KEY."
     );
     this.name = "MissingOpenAIKeyError";
   }
 }
 
-/**
- * Build an `openai` REST client (from the `openai` npm package) using
- * the key resolved for the given project. Used by the embeddings
- * pipeline, which doesn't go through the AI SDK.
- */
-export function getOpenAIClient(projectId: string): OpenAI {
-  const apiKey = resolveOpenAIKey(projectId);
-  if (!apiKey) throw new MissingOpenAIKeyError();
-  return new OpenAI({ apiKey });
+function googleProvider() {
+  const apiKey = resolveGeminiKey();
+  if (!apiKey) return null;
+  return createGoogleGenerativeAI({ apiKey });
 }
 
 /**
- * Build an AI SDK OpenAI provider scoped to a project. Used by every
- * `streamText` / `generateText` call — pass `provider("gpt-4o")` to the
- * `model` field instead of the default global `openai(...)` import.
+ * Build an AI SDK OpenAI provider scoped to a project. Kept for callers
+ * that explicitly need OpenAI; new code should use getChatModel /
+ * getFastModel / getEmbeddingModel instead.
  */
 export function getOpenAIProvider(projectId: string): OpenAIProvider {
   const apiKey = resolveOpenAIKey(projectId);
@@ -55,11 +64,46 @@ export function getOpenAIProvider(projectId: string): OpenAIProvider {
   return createOpenAI({ apiKey });
 }
 
+/** Main conversational model (chat, interview composer). */
+export function getChatModel(projectId: string): LanguageModel {
+  const google = googleProvider();
+  if (google) {
+    return google(process.env.CLARIX_CHAT_MODEL || "gemini-2.0-flash");
+  }
+  return getOpenAIProvider(projectId)(
+    process.env.CLARIX_CHAT_MODEL || "gpt-4o"
+  );
+}
+
+/** Cheap, fast model for auxiliary calls (quick replies, suggestions). */
+export function getFastModel(projectId: string): LanguageModel {
+  const google = googleProvider();
+  if (google) {
+    return google(process.env.CLARIX_FAST_MODEL || "gemini-2.0-flash-lite");
+  }
+  return getOpenAIProvider(projectId)(
+    process.env.CLARIX_FAST_MODEL || "gpt-4o-mini"
+  );
+}
+
+/** Embedding model for the RAG pipeline. */
+export function getEmbeddingModel(projectId: string): EmbeddingModel {
+  const google = googleProvider();
+  if (google) {
+    return google.textEmbedding(
+      process.env.CLARIX_EMBEDDING_MODEL || "text-embedding-004"
+    );
+  }
+  return getOpenAIProvider(projectId).textEmbedding(
+    process.env.CLARIX_EMBEDDING_MODEL || "text-embedding-3-small"
+  );
+}
+
 /**
- * True when the project (or environment) has a usable OpenAI key.
- * Cheap check that routes can use to short-circuit with a 400 before
- * touching the AI SDK.
+ * True when the project (or environment) has a usable AI key, from
+ * either provider. Cheap check that routes use to short-circuit with a
+ * 400 before touching the AI SDK.
  */
 export function hasOpenAIKey(projectId: string): boolean {
-  return resolveOpenAIKey(projectId) !== null;
+  return resolveGeminiKey() !== null || resolveOpenAIKey(projectId) !== null;
 }

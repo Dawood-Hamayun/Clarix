@@ -1,0 +1,49 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Clarix" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e7]
+          - generic [ref=e10]: Clarix
+        - generic [ref=e13]: "1"
+    - main [ref=e31]:
+      - generic [ref=e34]:
+        - img [ref=e36]
+        - generic [ref=e41]:
+          - heading "Welcome to the Clarix demo" [level=1] [ref=e42]
+          - paragraph [ref=e43]: Everything here runs on a sample company, so you can push it as hard as you like. Here's how to get the most out of it.
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - generic [ref=e47]: "01"
+              - generic [ref=e48]:
+                - paragraph [ref=e49]: Open the demo workspace
+                - paragraph [ref=e50]: A complete sample company — Acme Cloud — with its knowledge base already loaded. Nothing to configure.
+            - generic [ref=e51]:
+              - generic [ref=e52]: "02"
+              - generic [ref=e53]:
+                - paragraph [ref=e54]: Ask Ava the easy ones
+                - paragraph [ref=e55]: Pricing, refunds, security, integrations. Watch every answer arrive in seconds, with its source cited underneath.
+            - generic [ref=e56]:
+              - generic [ref=e57]: "03"
+              - generic [ref=e58]:
+                - paragraph [ref=e59]: Then try to trip it up
+                - paragraph [ref=e60]: Ask something that isn't in the docs. Instead of inventing an answer, it hands off to a human — that's the whole point.
+            - generic [ref=e61]:
+              - generic [ref=e62]: "04"
+              - generic [ref=e63]:
+                - paragraph [ref=e64]: Check the dashboard
+                - paragraph [ref=e65]: Every conversation, source, and knowledge gap is logged. This is what your support team would see daily.
+          - button "Open the demo workspace" [ref=e66] [cursor=pointer]:
+            - text: Open the demo workspace
+            - img [ref=e67]
+          - link "Want it on your own docs? This demo runs on our sample data. For a private pilot trained on your real content, reach out — setup takes about a day." [ref=e69] [cursor=pointer]:
+            - /url: mailto:fixitdavid7@gmail.com?subject=Clarix%20pilot%20%E2%80%94%20test%20it%20on%20our%20data
+            - generic [ref=e70]:
+              - paragraph [ref=e71]: Want it on your own docs?
+              - paragraph [ref=e72]: This demo runs on our sample data. For a private pilot trained on your real content, reach out — setup takes about a day.
+            - img [ref=e73]
+  - button "Open Next.js Dev Tools" [ref=e81] [cursor=pointer]:
+    - img [ref=e82]
+  - alert [ref=e85]

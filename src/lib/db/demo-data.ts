@@ -6,7 +6,7 @@
  *
  * The content is intentionally written so each paragraph is a tight,
  * self-contained block that includes the natural-language phrasing a
- * customer would actually type — "what are your support hours", "do
+ * customer would actually type, "what are your support hours", "do
  * you have an email for support", "how much is the business plan".
  * That keeps embeddings well-aligned with real queries instead of
  * relying on the chunker to find the answer inside a wide table.
@@ -25,9 +25,9 @@ export interface DemoSource {
 export const DEMO_PROJECT = {
   name: "Acme Cloud",
   description:
-    "A fictional B2B SaaS used to showcase Clarix. Real product, real docs, real questions — just an imaginary company.",
+    "A fictional B2B SaaS used to showcase Clarix. Real product, real docs, real questions, just an imaginary company.",
   agentName: "Ava",
-  tagline: "AI support for Acme Cloud — the team workspace for modern teams.",
+  tagline: "AI support for Acme Cloud, the team workspace for modern teams.",
   greeting: "Hi! I'm Ava, Acme Cloud's support agent. How can I help?",
 };
 
@@ -37,11 +37,11 @@ export const DEMO_SOURCES: DemoSource[] = [
     name: "About Acme Cloud",
     content: `# About Acme Cloud
 
-Acme Cloud is a collaborative workspace for modern product teams. We help engineering, design, and PM teams plan, build, and ship together — without drowning in tools.
+Acme Cloud is a collaborative workspace for modern product teams. We help engineering, design, and PM teams plan, build, and ship together, without drowning in tools.
 
 ## Our mission
 
-Most teams use 8-12 different tools to coordinate work. Context lives in Slack threads, decisions disappear into Notion, and engineers waste 30% of their week just figuring out what to work on next. Acme Cloud puts roadmaps, specs, sprints, and release notes in one place — so the whole team works from the same source of truth.
+Most teams use 8-12 different tools to coordinate work. Context lives in Slack threads, decisions disappear into Notion, and engineers waste 30% of their week just figuring out what to work on next. Acme Cloud puts roadmaps, specs, sprints, and release notes in one place, so the whole team works from the same source of truth.
 
 ## Who uses Acme Cloud
 
@@ -49,7 +49,7 @@ We serve over 4,200 companies, from 5-person startups to Fortune 500 enterprises
 
 ## Where we're based
 
-Acme Cloud is fully remote with team members across 14 countries. Our headquarters is registered in San Francisco, California, and we have legal entities in the EU (Dublin, Ireland) and the UK (London) to support our European customers under GDPR. We operate three production data centers — Virginia (us-east-1), Frankfurt (eu-central-1), and Sydney (ap-southeast-2).
+Acme Cloud is fully remote with team members across 14 countries. Our headquarters is registered in San Francisco, California, and we have legal entities in the EU (Dublin, Ireland) and the UK (London) to support our European customers under GDPR. We operate three production data centers, Virginia (us-east-1), Frankfurt (eu-central-1), and Sydney (ap-southeast-2).
 
 ## When was Acme Cloud founded
 
@@ -57,10 +57,10 @@ Acme Cloud was founded in 2021 by Sarah Chen and Diego Martinez, both former pro
 
 ## Leadership team
 
-- **Sarah Chen** — CEO and co-founder. Previously a staff engineer at Stripe.
-- **Diego Martinez** — CTO and co-founder. Previously a design engineer at Figma.
-- **Priya Raman** — VP of Engineering. Joined from GitHub in 2023.
-- **Marcus O'Brien** — VP of Customer Success. Joined from Atlassian in 2022.
+- **Sarah Chen**: CEO and co-founder. Previously a staff engineer at Stripe.
+- **Diego Martinez**: CTO and co-founder. Previously a design engineer at Figma.
+- **Priya Raman**: VP of Engineering. Joined from GitHub in 2023.
+- **Marcus O'Brien**: VP of Customer Success. Joined from Atlassian in 2022.
 
 ## Awards and recognition
 
@@ -72,7 +72,7 @@ Acme Cloud was named to the Forbes Cloud 100 in 2025, won the Product Hunt "Prod
     name: "Acme Cloud features",
     content: `# Acme Cloud features
 
-Acme Cloud is built around four core surfaces — Roadmaps, Sprints, Specs, and Releases — plus a set of integrations, an API, and an AI assistant called Acme Copilot.
+Acme Cloud is built around four core surfaces, Roadmaps, Sprints, Specs, and Releases, plus a set of integrations, an API, and an AI assistant called Acme Copilot.
 
 ## Roadmaps
 
@@ -92,7 +92,7 @@ Auto-generated release notes from your shipped sprint items. Customize the tone 
 
 ## Acme Copilot (AI assistant)
 
-Acme Copilot is our built-in AI assistant. It can draft specs from a one-line prompt, summarize sprint standups, suggest acceptance criteria for issues, and answer questions about your workspace. Copilot uses GPT-4 and Claude under the hood — your data is never used to train models. Copilot is included on the Advanced AI add-on ($5/user/month).
+Acme Copilot is our built-in AI assistant. It can draft specs from a one-line prompt, summarize sprint standups, suggest acceptance criteria for issues, and answer questions about your workspace. Copilot uses GPT-4 and Claude under the hood, your data is never used to train models. Copilot is included on the Advanced AI add-on ($5/user/month).
 
 ## Integrations
 
@@ -113,8 +113,8 @@ Acme Cloud has Chrome, Firefox, and Safari extensions that let you create issues
   },
   {
     categorySlug: "products",
-    name: "Acme Copilot — AI features deep dive",
-    content: `# Acme Copilot — AI features deep dive
+    name: "Acme Copilot, AI features deep dive",
+    content: `# Acme Copilot, AI features deep dive
 
 Acme Copilot is the AI assistant built into Acme Cloud. It's available as the **Advanced AI** add-on ($5 per user per month) and is included for free during a 14-day trial when you sign up.
 
@@ -125,7 +125,7 @@ Acme Copilot is the AI assistant built into Acme Cloud. It's available as the **
 - **Standup summaries:** Reads everyone's standup notes and produces a one-paragraph "what the team did yesterday" digest, posted to Slack each morning.
 - **Acceptance criteria:** Highlight any issue and Copilot suggests Gherkin-style acceptance criteria.
 - **Q&A:** Ask "what's blocking the checkout redesign?" or "who owns the auth refactor?" and Copilot answers from your workspace data.
-- **Smart search:** Semantic search across all roadmaps, sprints, specs, and comments — no exact keyword needed.
+- **Smart search:** Semantic search across all roadmaps, sprints, specs, and comments, no exact keyword needed.
 
 ## Which models does Acme Copilot use?
 
@@ -155,7 +155,7 @@ On the Advanced AI add-on, each user gets up to 500 AI generations per month (sp
 
 Acme Cloud is priced per active user per month, billed monthly or annually. Annual plans get 20% off. We accept all major credit cards, ACH (US), SEPA (EU), wire transfer, and PayPal. Invoicing is available on Business and Enterprise plans. All prices are in USD by default but Enterprise customers can be billed in EUR, GBP, or AUD.
 
-## Free — $0 forever
+## Free, $0 forever
 
 The Free plan is free forever. It includes:
 
@@ -168,7 +168,7 @@ The Free plan is free forever. It includes:
 
 Ideal for small open-source teams, solo founders, or anyone evaluating the product.
 
-## Starter — $8 per user per month
+## Starter, $8 per user per month
 
 The Starter plan is best for teams of 5 to 25 people. It includes:
 
@@ -180,7 +180,7 @@ The Starter plan is best for teams of 5 to 25 people. It includes:
 - Email support with a 24-hour response SLA
 - 30-day audit log retention
 
-## Business — $16 per user per month
+## Business, $16 per user per month
 
 The Business plan is best for teams of 25 to 200 people. It includes everything in Starter, plus:
 
@@ -192,7 +192,7 @@ The Business plan is best for teams of 25 to 200 people. It includes everything 
 - Priority email and chat support with a 4-hour response SLA
 - 99.9% uptime SLA
 
-## Enterprise — Custom pricing
+## Enterprise, Custom pricing
 
 Enterprise is for teams of 200 or more, or for companies in regulated industries. Pricing typically starts at $35,000 per year. The Enterprise plan includes everything in Business, plus:
 
@@ -209,10 +209,10 @@ Enterprise is for teams of 200 or more, or for companies in regulated industries
 
 ## Add-ons (any plan)
 
-- **Advanced AI** — $5/user/month. Adds Acme Copilot (spec drafting, sprint summaries, smart search, AI Q&A).
-- **Extra storage** — $20/month per 100GB beyond plan limits. Plan limits are 10GB on Free, 100GB on Starter, 500GB on Business, 5TB on Enterprise.
-- **Premium support** — $1,500/month flat. Adds 1-hour SLA, named support engineer, quarterly business reviews. Available on Business plans.
-- **Sandbox environment** — $500/month flat. A separate workspace mirrored from production for testing changes safely.
+- **Advanced AI**: $5/user/month. Adds Acme Copilot (spec drafting, sprint summaries, smart search, AI Q&A).
+- **Extra storage**: $20/month per 100GB beyond plan limits. Plan limits are 10GB on Free, 100GB on Starter, 500GB on Business, 5TB on Enterprise.
+- **Premium support**: $1,500/month flat. Adds 1-hour SLA, named support engineer, quarterly business reviews. Available on Business plans.
+- **Sandbox environment**: $500/month flat. A separate workspace mirrored from production for testing changes safely.
 
 ## Discounts
 
@@ -231,8 +231,8 @@ An active user is anyone who signs into Acme Cloud at least once during the bill
   },
   {
     categorySlug: "pricing",
-    name: "Pricing FAQ — common billing questions",
-    content: `# Pricing FAQ — common billing questions
+    name: "Pricing FAQ, common billing questions",
+    content: `# Pricing FAQ, common billing questions
 
 ## How much does Acme Cloud cost?
 
@@ -240,7 +240,7 @@ Acme Cloud has four plans: **Free** ($0), **Starter** ($8 per user per month), *
 
 ## Is there a free version of Acme Cloud?
 
-Yes. The Free plan supports up to 5 users, 1 workspace, and 100 issues per month — forever, no credit card required. We also offer a 14-day free trial of the Business plan with all features unlocked.
+Yes. The Free plan supports up to 5 users, 1 workspace, and 100 issues per month, forever, no credit card required. We also offer a 14-day free trial of the Business plan with all features unlocked.
 
 ## Do you offer a free trial?
 
@@ -260,7 +260,7 @@ Prices do not include tax. We charge applicable sales tax for US customers and V
 
 ## Can I get a discount?
 
-Yes — annual billing saves 20%. Startups under 2 years old with less than $1M in funding get 50% off for their first year. Educational institutions and registered non-profits get 30% off year-round. Email billing@acmecloud.example to apply for any discount.
+Yes, annual billing saves 20%. Startups under 2 years old with less than $1M in funding get 50% off for their first year. Educational institutions and registered non-profits get 30% off year-round. Email billing@acmecloud.example to apply for any discount.
 
 ## How do I upgrade or downgrade my plan?
 
@@ -290,11 +290,11 @@ Yes. Email billing@acmecloud.example and we'll send our W-9 (US), VAT certificat
 
 ## What is Acme Cloud?
 
-Acme Cloud is a collaborative workspace for product teams. It combines roadmaps, sprints, technical specs, and release notes into one tool — so engineering, design, and PMs can plan and ship together without juggling 8 different apps.
+Acme Cloud is a collaborative workspace for product teams. It combines roadmaps, sprints, technical specs, and release notes into one tool, so engineering, design, and PMs can plan and ship together without juggling 8 different apps.
 
 ## Can I try Acme Cloud before paying?
 
-Yes. The Free plan is forever free for up to 5 users, no credit card required. We also offer a 14-day free trial of the Business plan with all features unlocked — no card needed for the trial either.
+Yes. The Free plan is forever free for up to 5 users, no credit card required. We also offer a 14-day free trial of the Business plan with all features unlocked, no card needed for the trial either.
 
 ## How do I sign up?
 
@@ -330,7 +330,7 @@ No, we don't currently offer a self-hosted version. Enterprise customers can req
 
 ## Does Acme Cloud have a mobile app?
 
-Yes, we have native iOS and Android apps for viewing roadmaps, responding to comments, and getting notifications. Spec editing is web-only — the editor is too complex for a small screen and we'd rather not ship a bad version.
+Yes, we have native iOS and Android apps for viewing roadmaps, responding to comments, and getting notifications. Spec editing is web-only, the editor is too complex for a small screen and we'd rather not ship a bad version.
 
 ## Does Acme Cloud work offline?
 
@@ -354,7 +354,7 @@ Email support@acmecloud.example or use the chat bubble in-product. Critical bugs
 
 ## How do I request a feature?
 
-We have a public roadmap and feedback portal at feedback.acmecloud.example. Vote on existing requests or submit new ones — we read every submission and the team prioritizes top-voted items each quarter.
+We have a public roadmap and feedback portal at feedback.acmecloud.example. Vote on existing requests or submit new ones, we read every submission and the team prioritizes top-voted items each quarter.
 `,
   },
   {
@@ -370,7 +370,7 @@ If you've forgotten your password or just want to rotate it, follow these steps.
 2. Click "Forgot password?" below the password field
 3. Enter the email address associated with your Acme Cloud account
 4. Check your inbox for an email from no-reply@acmecloud.example with the subject "Reset your Acme Cloud password"
-5. Click the link in the email — it's valid for 60 minutes
+5. Click the link in the email, it's valid for 60 minutes
 6. Choose a new password (minimum 12 characters, one uppercase, one number, one symbol)
 7. You'll be automatically signed in once the new password is saved
 
@@ -384,7 +384,7 @@ If you've forgotten your password or just want to rotate it, follow these steps.
 
 ## I'm not getting the password reset email
 
-Wait 5 minutes — sometimes our email provider queues during high traffic. If it still hasn't arrived:
+Wait 5 minutes, sometimes our email provider queues during high traffic. If it still hasn't arrived:
 
 - Check your spam folder
 - Check that the email matches the one on your account (case-insensitive but typos count)
@@ -394,7 +394,7 @@ Wait 5 minutes — sometimes our email provider queues during high traffic. If i
 
 If none of that works, contact support@acmecloud.example with the email address you're trying to reset and we'll manually trigger a reset.
 
-## My account uses SSO — how do I reset?
+## My account uses SSO, how do I reset?
 
 If your team signs in with SSO (Google, Okta, Microsoft Entra ID), you can't reset your password through Acme Cloud. Reset it through your identity provider instead. Acme Cloud will pick up the new password automatically the next time you sign in.
 
@@ -430,9 +430,9 @@ For larger teams, generate a shareable invite link instead:
 
 ## Roles explained
 
-- **Admin** — can manage billing, members, integrations, and workspace settings. Can delete the workspace. Recommended for 1-3 trusted team members.
-- **Member** — full access to roadmaps, sprints, specs, and releases. Can invite other Members and Guests but not Admins. The default for most teammates.
-- **Guest** — read-only access to specific items you share with them. Guests don't count toward your billable user count. Use this for clients, contractors, or stakeholders who only need to view.
+- **Admin**: can manage billing, members, integrations, and workspace settings. Can delete the workspace. Recommended for 1-3 trusted team members.
+- **Member**: full access to roadmaps, sprints, specs, and releases. Can invite other Members and Guests but not Admins. The default for most teammates.
+- **Guest**: read-only access to specific items you share with them. Guests don't count toward your billable user count. Use this for clients, contractors, or stakeholders who only need to view.
 
 ## Bulk invites via CSV
 
@@ -445,7 +445,7 @@ On Business and Enterprise plans, you can upload a CSV of users to invite at onc
 
 ## SCIM provisioning (Enterprise only)
 
-Enterprise customers can sync users automatically from Okta, Microsoft Entra ID, OneLogin, or any SCIM 2.0-compatible provider. Once SCIM is configured, adding a user to the right group in your IdP automatically creates their Acme Cloud account; removing them deactivates the account. Setup takes about 15 minutes — see the Enterprise SSO setup guide or contact your customer success manager.
+Enterprise customers can sync users automatically from Okta, Microsoft Entra ID, OneLogin, or any SCIM 2.0-compatible provider. Once SCIM is configured, adding a user to the right group in your IdP automatically creates their Acme Cloud account; removing them deactivates the account. Setup takes about 15 minutes, see the Enterprise SSO setup guide or contact your customer success manager.
 
 ## How do I remove someone from a workspace?
 
@@ -453,13 +453,13 @@ Settings → Members → find the user → click the three-dot menu → "Remove 
 
 ## Why can't I invite more people?
 
-Two common reasons: (1) you're on the Free plan which is capped at 5 users — upgrade to Starter or Business to add more; (2) you're not an Admin — only Admins can invite Members and Guests on Business+. Ask an existing Admin to invite you, or have them upgrade your role to Admin.
+Two common reasons: (1) you're on the Free plan which is capped at 5 users, upgrade to Starter or Business to add more; (2) you're not an Admin, only Admins can invite Members and Guests on Business+. Ask an existing Admin to invite you, or have them upgrade your role to Admin.
 `,
   },
   {
     categorySlug: "how-to",
-    name: "Getting started — your first workspace",
-    content: `# Getting started — your first workspace
+    name: "Getting started, your first workspace",
+    content: `# Getting started, your first workspace
 
 This guide walks you through your first 30 minutes in Acme Cloud, from signup to your first sprint.
 
@@ -469,7 +469,7 @@ Go to acmecloud.example/signup. You can sign up with your work email or with Goo
 
 ## Step 2: Name your workspace
 
-After signup, you'll be prompted to create your first workspace. Use your company or team name — this is what teammates see in invites and notifications. You can rename the workspace anytime under Settings → Workspace → General.
+After signup, you'll be prompted to create your first workspace. Use your company or team name, this is what teammates see in invites and notifications. You can rename the workspace anytime under Settings → Workspace → General.
 
 ## Step 3: Invite your team
 
@@ -481,7 +481,7 @@ Acme Cloud ships with 12 starter templates: SaaS Engineering, Mobile App, Hardwa
 
 ## Step 5: Create your first roadmap
 
-Click "New roadmap" and pick a timeline (quarterly, monthly, or custom range). Add 3-5 initiatives — these are the big themes you want to ship over the next quarter. Each initiative can have a confidence score, effort estimate, and target date.
+Click "New roadmap" and pick a timeline (quarterly, monthly, or custom range). Add 3-5 initiatives, these are the big themes you want to ship over the next quarter. Each initiative can have a confidence score, effort estimate, and target date.
 
 ## Step 6: Plan your first sprint
 
@@ -498,7 +498,7 @@ If you have the Advanced AI add-on or are still in your free trial, try Copilot.
 ## What's next?
 
 - Read the [Sprints guide](docs.acmecloud.example/sprints) to learn about velocity, burndown, and standups
-- Explore [keyboard shortcuts](docs.acmecloud.example/shortcuts) — Acme Cloud is very keyboard-friendly
+- Explore [keyboard shortcuts](docs.acmecloud.example/shortcuts), Acme Cloud is very keyboard-friendly
 - Join the [Acme Cloud community](acmecloud.example/community) on Slack (4,200+ members)
 `,
   },
@@ -514,7 +514,7 @@ If something isn't working in Acme Cloud, try these fixes first. If they don't h
 - Make sure you're using the email you originally signed up with. Acme Cloud doesn't merge accounts across different email addresses.
 - If your team uses SSO, sign in via your IdP (Google, Okta, Microsoft Entra ID) instead of the password form.
 - If you've forgotten your password, click "Forgot password?" on the login page. The reset link is valid for 60 minutes.
-- Clear your cookies for acmecloud.example and try again — stale auth cookies are a common cause.
+- Clear your cookies for acmecloud.example and try again, stale auth cookies are a common cause.
 
 ## The page is blank or won't load
 
@@ -527,7 +527,7 @@ If something isn't working in Acme Cloud, try these fixes first. If they don't h
 
 - Re-authenticate the integration: Settings → Integrations → GitHub → "Reconnect". OAuth tokens occasionally expire.
 - Make sure the GitHub user has admin or write access to the repository you're linking to.
-- Check that the repo is in the organization you connected — Acme Cloud only sees repos in connected orgs.
+- Check that the repo is in the organization you connected, Acme Cloud only sees repos in connected orgs.
 
 ## Notifications aren't arriving
 
@@ -545,7 +545,7 @@ If something isn't working in Acme Cloud, try these fixes first. If they don't h
 ## My workspace feels slow
 
 - Most slowness comes from very large roadmap views. Try filtering to a single team or quarter.
-- Old sprint history can also slow things down — archive sprints older than 6 months under Settings → Sprints → Archive.
+- Old sprint history can also slow things down, archive sprints older than 6 months under Settings → Sprints → Archive.
 - If slowness persists, send us a HAR file (instructions at docs.acmecloud.example/har) and we'll investigate.
 
 ## Why was my data deleted?
@@ -555,7 +555,7 @@ Data is only deleted in three cases:
 2. Your subscription was canceled and the 90-day retention window passed.
 3. Your account was deleted.
 
-If none of these apply, contact security@acmecloud.example immediately — we have backup snapshots up to 30 days back and can restore.
+If none of these apply, contact security@acmecloud.example immediately, we have backup snapshots up to 30 days back and can restore.
 `,
   },
   {
@@ -569,9 +569,9 @@ Acme Cloud is built for teams that care about privacy and compliance. Here's wha
 
 We collect three categories of data:
 
-1. **Account data** — name, email, profile photo, organization name. Required to create an account.
-2. **Workspace content** — roadmaps, specs, sprints, comments, files. This is your data. We never train AI models on it.
-3. **Usage analytics** — anonymized events about which features you use, how often, and from where. Helps us improve the product.
+1. **Account data**: name, email, profile photo, organization name. Required to create an account.
+2. **Workspace content**: roadmaps, specs, sprints, comments, files. This is your data. We never train AI models on it.
+3. **Usage analytics**: anonymized events about which features you use, how often, and from where. Helps us improve the product.
 
 ## What we don't do
 
@@ -587,7 +587,7 @@ If you're in the EU/UK, you have the right to:
 - Correct inaccurate data
 - Delete your data (Settings → Account → Delete account)
 - Object to processing for analytics (Settings → Privacy → Disable analytics)
-- Data portability — export your workspace as JSON anytime
+- Data portability, export your workspace as JSON anytime
 
 To exercise these rights or ask questions, contact privacy@acmecloud.example. We respond within 30 days as required by law.
 
@@ -624,12 +624,12 @@ Acme Cloud takes security seriously. This page covers our certifications, contro
 
 ## Certifications
 
-- **SOC 2 Type II** — Annual audit by Drata. Report available under NDA at security@acmecloud.example.
-- **ISO 27001:2022** — Certified as of March 2025.
-- **GDPR** — Compliant. DPA available at acmecloud.example/dpa.
-- **CCPA** — Compliant. We honor "Do Not Sell" requests via Settings → Privacy.
-- **HIPAA** — HIPAA-ready. BAAs available on Enterprise plans.
-- **PCI DSS** — Out of scope. Payments are processed by Stripe; we never see or store card data.
+- **SOC 2 Type II**: Annual audit by Drata. Report available under NDA at security@acmecloud.example.
+- **ISO 27001:2022**: Certified as of March 2025.
+- **GDPR**: Compliant. DPA available at acmecloud.example/dpa.
+- **CCPA**: Compliant. We honor "Do Not Sell" requests via Settings → Privacy.
+- **HIPAA**: HIPAA-ready. BAAs available on Enterprise plans.
+- **PCI DSS**: Out of scope. Payments are processed by Stripe; we never see or store card data.
 
 ## Encryption
 
@@ -640,7 +640,7 @@ All data in transit is encrypted with TLS 1.3. All data at rest is encrypted wit
 - All employee access to production systems requires hardware-backed 2FA (YubiKey).
 - Production access is granted just-in-time via PR review and expires automatically after 4 hours.
 - All production actions are logged to an immutable audit trail.
-- We follow the principle of least privilege — engineers only get access to the systems they actively need.
+- We follow the principle of least privilege, engineers only get access to the systems they actively need.
 
 ## Penetration testing
 
@@ -656,10 +656,10 @@ To report a vulnerability directly, email security@acmecloud.example. Our PGP ke
 
 If we detect a security incident, our process is:
 
-1. **Detect and contain** — within 15 minutes of detection
-2. **Investigate and assess scope** — within 1 hour
-3. **Notify affected customers** — within 24 hours if customer data is involved, regardless of severity
-4. **Public post-mortem** — published within 7 days for incidents that affected customer data
+1. **Detect and contain**: within 15 minutes of detection
+2. **Investigate and assess scope**: within 1 hour
+3. **Notify affected customers**: within 24 hours if customer data is involved, regardless of severity
+4. **Public post-mortem**: published within 7 days for incidents that affected customer data
 
 We've never had a customer data breach. Status updates are published in real-time at status.acmecloud.example.
 
@@ -667,16 +667,16 @@ We've never had a customer data breach. Status updates are published in real-tim
 
 SSO is available on Business and Enterprise plans. We support:
 
-- **Google Workspace** — included on Business
-- **Microsoft Entra ID (Azure AD)** — included on Business
-- **Okta** — included on Business
-- **OneLogin** — included on Business
-- **Generic SAML 2.0** — Enterprise only
-- **SCIM 2.0 provisioning** — Enterprise only
+- **Google Workspace**: included on Business
+- **Microsoft Entra ID (Azure AD)**: included on Business
+- **Okta**: included on Business
+- **OneLogin**: included on Business
+- **Generic SAML 2.0**: Enterprise only
+- **SCIM 2.0 provisioning**: Enterprise only
 
 ## Audit logs
 
-Every significant action — sign-ins, permission changes, content deletes, API token creation — is logged to an audit log. Retention is 30 days on Starter, 1 year on Business, and 7 years on Enterprise. Audit logs can be exported as JSON or streamed to Splunk, Datadog, or AWS S3 in real time on Enterprise.
+Every significant action, sign-ins, permission changes, content deletes, API token creation, is logged to an audit log. Retention is 30 days on Starter, 1 year on Business, and 7 years on Enterprise. Audit logs can be exported as JSON or streamed to Splunk, Datadog, or AWS S3 in real time on Enterprise.
 `,
   },
   {
@@ -688,7 +688,7 @@ The fastest way to reach Acme Cloud support is the in-product chat (the bubble i
 
 ## Email addresses for support
 
-The main email address for general support questions is **support@acmecloud.example**. For other topics, use the dedicated address — that's the fastest way to get a response from the right team.
+The main email address for general support questions is **support@acmecloud.example**. For other topics, use the dedicated address, that's the fastest way to get a response from the right team.
 
 - **General product support:** support@acmecloud.example
 - **Billing, refunds, and invoices:** billing@acmecloud.example
@@ -704,7 +704,7 @@ The main email address for general support questions is **support@acmecloud.exam
 
 Our support hours depend on your plan:
 
-- **Free plan:** Community support only — best effort, typically a 48-72 hour response. Available Monday through Friday.
+- **Free plan:** Community support only, best effort, typically a 48-72 hour response. Available Monday through Friday.
 - **Starter plan:** Email support is available **Monday to Friday, 9am to 6pm Pacific Time**, with a 24-hour first-response SLA.
 - **Business plan:** Email and chat support is available **Monday to Friday, 7am to 9pm Pacific Time**, with a 4-hour first-response SLA.
 - **Enterprise plan:** Phone, chat, and email support is available **24 hours a day, 7 days a week**, with a 1-hour first-response SLA.
@@ -722,7 +722,7 @@ Live chat is available in-product (the chat bubble in the bottom-right) on Busin
 
 ## Community support
 
-Join the Acme Cloud Slack community at **acmecloud.example/community** — over 4,200 members, plus the Acme Cloud team. The community is the fastest place to get tips and workflows from other users.
+Join the Acme Cloud Slack community at **acmecloud.example/community**: over 4,200 members, plus the Acme Cloud team. The community is the fastest place to get tips and workflows from other users.
 
 ## Status page
 
@@ -748,7 +748,7 @@ United States
 
 ## Are you hiring?
 
-Yes — we have open roles in engineering, design, product, sales, and customer success. See the full list at **acmecloud.example/careers** or email **careers@acmecloud.example**.
+Yes, we have open roles in engineering, design, product, sales, and customer success. See the full list at **acmecloud.example/careers** or email **careers@acmecloud.example**.
 `,
   },
 ];

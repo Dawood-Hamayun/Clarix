@@ -1,3 +1,4 @@
+import { isDemoLocked } from "@/lib/demo-mode";
 import { NextResponse } from "next/server";
 import { store } from "@/lib/db/store";
 import { vectorStore } from "@/lib/db/vector-store";
@@ -21,6 +22,12 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ sourceId: string }> }
 ) {
+  if (isDemoLocked()) {
+    return NextResponse.json(
+      { error: "Knowledge is locked in this demo.", code: "demo_locked" },
+      { status: 403 }
+    );
+  }
   await store.ready();
   const { sourceId } = await params;
   const source = store.getSource(sourceId);
@@ -74,6 +81,12 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ sourceId: string }> }
 ) {
+  if (isDemoLocked()) {
+    return NextResponse.json(
+      { error: "Knowledge is locked in this demo.", code: "demo_locked" },
+      { status: 403 }
+    );
+  }
   await store.ready();
   const { sourceId } = await params;
   await vectorStore.deleteBySource(sourceId);

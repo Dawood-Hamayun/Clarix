@@ -1,0 +1,112 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e45] [cursor=pointer]:
+    - img [ref=e46]
+  - alert [ref=e50]
+  - generic [ref=e93]:
+    - complementary [ref=e94]:
+      - link "Clarix" [ref=e96] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e98]
+        - generic [ref=e101]: Clarix
+      - navigation [ref=e102]:
+        - link "Overview" [ref=e103] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e104]
+          - generic [ref=e109]: Overview
+        - link "Knowledge Base" [ref=e110] [cursor=pointer]:
+          - /url: /dashboard/knowledge
+          - img [ref=e111]
+          - generic [ref=e113]: Knowledge Base
+        - link "Conversations" [ref=e114] [cursor=pointer]:
+          - /url: /dashboard/conversations
+          - img [ref=e115]
+          - generic [ref=e117]: Conversations
+        - link "Playground" [ref=e118] [cursor=pointer]:
+          - /url: /dashboard/playground
+          - img [ref=e120]
+          - generic [ref=e122]: Playground
+        - link "Widget" [ref=e123] [cursor=pointer]:
+          - /url: /dashboard/widget
+          - img [ref=e124]
+          - generic [ref=e128]: Widget
+        - link "Integrations" [ref=e129] [cursor=pointer]:
+          - /url: /dashboard/integrations
+          - img [ref=e130]
+          - generic [ref=e132]: Integrations
+        - link "Settings" [ref=e133] [cursor=pointer]:
+          - /url: /dashboard/settings
+          - img [ref=e134]
+          - generic [ref=e137]: Settings
+      - link "Y Your Company Connect OpenAI" [ref=e139] [cursor=pointer]:
+        - /url: /dashboard/settings
+        - generic [ref=e140]: "Y"
+        - generic [ref=e141]:
+          - paragraph [ref=e142]: Your Company
+          - paragraph [ref=e143]: Connect OpenAI
+        - img [ref=e144]
+    - generic [ref=e148]:
+      - banner [ref=e149]:
+        - generic [ref=e151]:
+          - heading "Playground" [level=1] [ref=e152]
+          - paragraph [ref=e153]: Talk to your agent
+        - generic [ref=e155]:
+          - img
+          - textbox "Search or jump to…" [ref=e156]
+          - generic:
+            - img
+            - text: K
+      - main [ref=e157]:
+        - generic [ref=e160]:
+          - generic [ref=e162]:
+            - generic [ref=e163]:
+              - generic [ref=e164]:
+                - img [ref=e167]
+                - generic [ref=e171]:
+                  - paragraph [ref=e172]: Playground
+                  - paragraph [ref=e173]: New session, ask anything to get started
+              - button "Start fresh" [ref=e174] [cursor=pointer]:
+                - img [ref=e175]
+                - text: Start fresh
+            - generic [ref=e179]:
+              - img [ref=e181]
+              - heading "Ask anything" [level=3] [ref=e184]
+              - paragraph [ref=e185]: Your agent answers from the knowledge base with inline citations and confidence scoring.
+              - generic [ref=e186]:
+                - button "What features are included in the free plan?" [ref=e187] [cursor=pointer]
+                - button "How do I invite team members to join?" [ref=e188] [cursor=pointer]
+                - button "Can I change my subscription plan later?" [ref=e189] [cursor=pointer]
+            - generic [ref=e190]:
+              - generic [ref=e191]:
+                - textbox "Ask anything…" [ref=e192]
+                - button [disabled] [ref=e193]:
+                  - img [ref=e194]
+              - paragraph [ref=e197]: Powered by Clarix · Enter to send
+          - generic [ref=e198]:
+            - generic [ref=e199]:
+              - generic [ref=e201]:
+                - img [ref=e202]
+                - heading "Retrieved sources" [level=3] [ref=e206]
+              - paragraph [ref=e208]: Ask a question to see which sources were fetched.
+            - generic [ref=e209]:
+              - heading "How it works" [level=3] [ref=e210]
+              - list [ref=e211]:
+                - listitem [ref=e212]:
+                  - generic [ref=e213]: "1"
+                  - text: Your question gets embedded into a vector
+                - listitem [ref=e214]:
+                  - generic [ref=e215]: "2"
+                  - text: We find the most relevant chunks from your KB
+                - listitem [ref=e216]:
+                  - generic [ref=e217]: "3"
+                  - text: GPT-4o answers using only that context
+            - generic [ref=e218]:
+              - generic [ref=e219]:
+                - img [ref=e220]
+                - heading "Knowledge Base" [level=3] [ref=e222]
+              - generic [ref=e223]:
+                - generic [ref=e224]:
+                  - paragraph [ref=e225]: "16"
+                  - paragraph [ref=e226]: Sources
+                - generic [ref=e227]:
+                  - paragraph [ref=e228]: "44"
+                  - paragraph [ref=e229]: Chunks

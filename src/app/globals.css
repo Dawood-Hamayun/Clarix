@@ -23,7 +23,7 @@
   /* ---------- Monochrome palette ---------- */
   --color-sand-50: #FAFAF9;
   --color-sand-100: #F4F4F3;
-  --color-sand-150: #ECEBE8;       /* Soft hover surface — between 100 and 200 */
+  --color-sand-150: #ECEBE8;       /* Soft hover surface, between 100 and 200 */
   --color-sand-200: #E7E7E5;
   --color-sand-300: #D1D1CF;
   --color-sand-400: #A8A8A5;
@@ -56,7 +56,7 @@
   --text-xs--line-height: 1.25rem;
   --text-sm: 0.9375rem;      /* 15 */
   --text-sm--line-height: 1.4375rem;
-  --text-base: 1.0625rem;    /* 17 — body default */
+  --text-base: 1.0625rem;    /* 17, body default */
   --text-base--line-height: 1.65rem;
   --text-lg: 1.1875rem;      /* 19 */
   --text-lg--line-height: 1.75rem;
@@ -70,7 +70,7 @@
   --text-4xl--line-height: 3.125rem;
   --text-5xl: 3.5rem;        /* 56 */
   --text-5xl--line-height: 3.875rem;
-  --text-6xl: 4.5rem;        /* 72 — display */
+  --text-6xl: 4.5rem;        /* 72, display */
   --text-6xl--line-height: 4.875rem;
 
   /* Tracking */
@@ -95,6 +95,7 @@
   html {
     font-feature-settings: "ss01", "ss02", "cv11";
     text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -190,6 +191,45 @@
   @keyframes gradient-shift {
     0%, 100% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
+  }
+
+  /* ---------- Editorial utilities (landing) ---------- */
+
+  /* Uppercase mono micro-label, section markers, captions, table headers */
+  .label-mono {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* Infinite marquee, duplicate the track content twice inside .marquee-track */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 48s linear infinite;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Blinking caret for the demo widget's simulated typing */
+  .demo-caret::after {
+    content: "";
+    display: inline-block;
+    width: 1.5px;
+    height: 1em;
+    margin-left: 2px;
+    background: currentColor;
+    vertical-align: text-bottom;
+    animation: caret-blink 0.9s steps(1) infinite;
+  }
+  @keyframes caret-blink {
+    0%, 60% { opacity: 1; }
+    61%, 100% { opacity: 0; }
   }
 
   /* Idle pulse for status dots */

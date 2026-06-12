@@ -12,16 +12,16 @@ import {
   Code2,
   Plug,
   Settings,
-  Sparkles,
   ExternalLink,
   X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ClarixMark } from "@/components/ui/clarix-mark";
 import type { PublicProject } from "@/lib/db/types";
 
 const navItems = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Knowledge Base", href: "/dashboard/knowledge", icon: BookOpen },
+  { label: "Knowledge", href: "/dashboard/knowledge", icon: BookOpen },
   {
     label: "Conversations",
     href: "/dashboard/conversations",
@@ -29,7 +29,7 @@ const navItems = [
   },
   { label: "Playground", href: "/dashboard/playground", icon: FlaskConical },
   { label: "Widget", href: "/dashboard/widget", icon: Code2 },
-  { label: "Integrations", href: "/dashboard/integrations", icon: Plug },
+  { label: "Install", href: "/dashboard/integrations", icon: Plug },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
@@ -69,7 +69,7 @@ export function Sidebar() {
     return () => window.removeEventListener("clarix:toggle-sidebar", onToggle);
   }, []);
 
-  // Close the drawer whenever the route changes — a tap on a nav item
+  // Close the drawer whenever the route changes, a tap on a nav item
   // should navigate AND dismiss in one motion.
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
@@ -89,7 +89,7 @@ export function Sidebar() {
     }
   }, [mobileOpen]);
 
-  const companyName = project?.widgetConfig.companyName || "Your workspace";
+  const companyName = project?.widgetConfig.companyName || "Acme Cloud";
   const initial = (companyName[0] || "C").toUpperCase();
 
   return (
@@ -114,7 +114,7 @@ export function Sidebar() {
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
-        {/* Brand — height matches Topbar (h-20) so the bottom borders align */}
+        {/* Brand, height matches Topbar (h-20) so the bottom borders align */}
         <div className="h-20 px-6 flex items-center justify-between border-b border-sand-200">
           <Link
             href="/dashboard"
@@ -122,17 +122,16 @@ export function Sidebar() {
             onClick={() => setMobileOpen(false)}
           >
             <motion.div
-              className="w-9 h-9 rounded-xl bg-sand-900 flex items-center justify-center shadow-sand"
               whileHover={{ rotate: -8, scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              <Sparkles className="w-4.5 h-4.5 text-white" />
+              <ClarixMark className="w-9 h-9" />
             </motion.div>
             <span className="text-xl font-bold text-sand-900 tracking-tighter">
               Clarix
             </span>
           </Link>
-          {/* Close button — visible only inside the mobile drawer */}
+          {/* Close button, visible only inside the mobile drawer */}
           <button
             onClick={() => setMobileOpen(false)}
             className="md:hidden w-9 h-9 rounded-lg text-sand-500 hover:text-sand-900 hover:bg-sand-100 transition-colors flex items-center justify-center -mr-2"
@@ -144,6 +143,7 @@ export function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-5 space-y-0.5 overflow-y-auto">
+          <p className="label-mono text-sand-400 px-3.5 pb-3">Workspace</p>
           {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -173,7 +173,7 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Bottom — project badge. Clicks through to settings so users can
+        {/* Bottom, project badge. Clicks through to settings so users can
             rename the workspace or swap the OpenAI key without hunting. */}
         <div className="px-3 py-3 border-t border-sand-200">
           <Link
@@ -185,7 +185,7 @@ export function Sidebar() {
               {project?.hasOpenAIApiKey && (
                 <div
                   className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-status-success border-2 border-white"
-                  title="OpenAI key connected"
+                  title="Agent online"
                 />
               )}
             </div>
@@ -194,7 +194,7 @@ export function Sidebar() {
                 {companyName}
               </p>
               <p className="text-[11px] text-sand-500 truncate">
-                {project?.hasOpenAIApiKey ? "OpenAI connected" : "Connect OpenAI"}
+                {project?.hasOpenAIApiKey ? "Agent online" : "Finish setup"}
               </p>
             </div>
             <ExternalLink className="w-3.5 h-3.5 text-sand-300 group-hover:text-sand-500 transition-colors shrink-0" />

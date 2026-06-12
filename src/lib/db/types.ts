@@ -5,7 +5,7 @@ export interface Project {
   /**
    * OpenAI API key scoped to this project. Collected during onboarding
    * so self-hosted users can bring their own key without editing .env.
-   * Never sent to the client in plaintext — the /api/project GET handler
+   * Never sent to the client in plaintext, the /api/project GET handler
    * returns `hasOpenAIApiKey` instead.
    */
   openAIApiKey?: string;
@@ -21,6 +21,8 @@ export interface Project {
  */
 export type PublicProject = Omit<Project, "openAIApiKey"> & {
   hasOpenAIApiKey: boolean;
+  /** True when CLARIX_DEMO_MODE locks the workspace read-only. */
+  demoLocked: boolean;
 };
 
 export interface WidgetConfig {
@@ -66,7 +68,7 @@ export interface AgentConfig {
   fallbackContactUrl?: string;
   /**
    * When true, the agent will proactively check in after it's answered
-   * a question — e.g. "Did that solve it?" — so customers have an easy
+   * a question, e.g. "Did that solve it?", so customers have an easy
    * path to mark the conversation resolved without waiting to click
    * 👍. Disabled by default because it can feel pushy.
    */
@@ -127,9 +129,9 @@ export interface Chunk {
  * Derived status of a conversation, based on thumbs-up/down feedback on
  * assistant answers within that conversation.
  *
- * - `resolved`    — ≥1 thumbs-up and 0 thumbs-downs.
- * - `unresolved`  — ≥1 thumbs-down (regardless of any thumbs-ups).
- * - `unrated`     — no feedback has been given yet. Most chats land here
+ * - `resolved`   , ≥1 thumbs-up and 0 thumbs-downs.
+ * - `unresolved` , ≥1 thumbs-down (regardless of any thumbs-ups).
+ * - `unrated`    , no feedback has been given yet. Most chats land here
  *                   because reacting is optional. These are *excluded*
  *                   from resolution-rate arithmetic on purpose.
  *
@@ -148,14 +150,14 @@ export interface Conversation {
     messageCount: number;
     /**
      * @deprecated Never written. Kept on the type so existing store
-     * blobs round-trip cleanly. Use the derived `status` field below —
-     * which comes from thumbs feedback — instead.
+     * blobs round-trip cleanly. Use the derived `status` field below,
+     * which comes from thumbs feedback, instead.
      */
     resolved: boolean;
     satisfaction?: number;
     customerName?: string;
     /**
-     * Explicit resolution signal from the customer — set when they
+     * Explicit resolution signal from the customer, set when they
      * click "Yes, this helped" / "No, I still need help" on the
      * end-of-chat prompt. Overrides the per-message feedback
      * aggregation in `getConversationStatus` so an intentional
@@ -223,7 +225,7 @@ export interface QueryEvent {
   promptTokens?: number;
   /** Completion tokens returned by the model for this turn. */
   completionTokens?: number;
-  /** Convenience sum — kept for fast aggregation without re-adding. */
+  /** Convenience sum, kept for fast aggregation without re-adding. */
   totalTokens?: number;
   createdAt: string;
 }
@@ -248,7 +250,7 @@ export interface TokenUsageSummary {
 }
 
 /**
- * Simple knowledge base health snapshot — used on the dashboard.
+ * Simple knowledge base health snapshot, used on the dashboard.
  * No grades, no weighted formulas, just the numbers that matter.
  */
 export interface KBHealthReport {

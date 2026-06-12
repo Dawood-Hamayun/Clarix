@@ -23,7 +23,7 @@ import type { PublicProject } from "@/lib/db/types";
  * quick replies, interview composer) uses the per-project key resolved
  * server-side, so we block the rest of the flow until the user has one.
  *
- * The guide is behind an info popup so the form itself stays focused —
+ * The guide is behind an info popup so the form itself stays focused,
  * one input, one button. Users who need hand-holding tap "How to get one"
  * and get the same 3-step walkthrough in a modal.
  */
@@ -75,15 +75,42 @@ export default function OnboardingApiKey() {
         setSaving(false);
         return;
       }
-      router.push("/onboarding/knowledge");
+      await continueAfterKey();
     } catch {
-      setError("Network error — check your connection and try again.");
+      setError("Network error, check your connection and try again.");
       setSaving(false);
     }
   };
 
-  const handleSkipAhead = () => {
+  /**
+   * If the user came from the "Explore the demo workspace" path, finish
+   * the seed now that a key exists and drop them straight in the
+   * playground. Otherwise continue the guided flow.
+   */
+  const continueAfterKey = async () => {
+    if (sessionStorage.getItem("clarix_demo_path") === "1") {
+      try {
+        const res = await fetch("/api/demo/seed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectId: "proj_demo" }),
+        });
+        if (res.ok) {
+          sessionStorage.removeItem("clarix_demo_path");
+          router.push("/dashboard/playground");
+          return;
+        }
+      } catch {
+        // Fall through to the guided flow, demo content can be loaded
+        // later from the knowledge step.
+      }
+      sessionStorage.removeItem("clarix_demo_path");
+    }
     router.push("/onboarding/knowledge");
+  };
+
+  const handleSkipAhead = () => {
+    void continueAfterKey();
   };
 
   return (
@@ -173,7 +200,7 @@ export default function OnboardingApiKey() {
             exit={{ opacity: 0, y: -8 }}
             className="max-w-md mx-auto"
           >
-            {/* Info strip — soft nudge that opens the full guide on click */}
+            {/* Info strip, soft nudge that opens the full guide on click */}
             <button
               type="button"
               onClick={() => setGuideOpen(true)}
@@ -187,7 +214,7 @@ export default function OnboardingApiKey() {
                   Don&apos;t have a key yet?
                 </p>
                 <p className="text-xs text-sand-500 truncate">
-                  Tap for a 3-step walkthrough — takes about a minute
+                  Tap for a 3-step walkthrough, takes about a minute
                 </p>
               </div>
               <ArrowRight className="w-4 h-4 text-sand-400 group-hover:text-sand-900 group-hover:translate-x-0.5 transition-all shrink-0" />

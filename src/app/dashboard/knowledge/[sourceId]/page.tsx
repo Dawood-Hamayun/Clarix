@@ -277,7 +277,7 @@ export default function SourceDetailPage({
         <div className="bg-sand-50 border border-sand-200 rounded-xl p-5 mt-4">
           <h3 className="text-sm font-semibold text-sand-900 mb-3 flex items-center gap-2">
             <Hash className="w-4 h-4 text-sand-500" />
-            Indexed chunks ({source.chunksData.length})
+            What the agent learned ({source.chunksData.length} answers)
           </h3>
           <div className="space-y-2 max-h-72 overflow-y-auto">
             {source.chunksData.map((chunk, i) => (

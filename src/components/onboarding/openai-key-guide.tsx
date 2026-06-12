@@ -17,7 +17,7 @@ import {
  * Visual language mirrors the KB guide (`src/components/knowledge/kb-guide.tsx`)
  * so the two feel like one system, but the surface is intentionally softer
  * (sand-50 card on a lighter sand-900/15 backdrop) because this is an
- * informational side-trip from the onboarding flow — not a destination.
+ * informational side-trip from the onboarding flow, not a destination.
  *
  * Kept in its own component so the onboarding page and the Settings page
  * can both pop the same overlay without duplicating the copy.
@@ -85,7 +85,7 @@ export function OpenAIKeyGuide({
                   Get your OpenAI key
                 </h3>
                 <p className="text-xs text-sand-500 mt-0.5">
-                  Takes about a minute — you&apos;ll need a paid account
+                  Takes about a minute, you&apos;ll need a paid account
                 </p>
               </div>
               <button
@@ -105,7 +105,7 @@ export function OpenAIKeyGuide({
                 title="Sign in to OpenAI"
                 href="https://platform.openai.com/api-keys"
                 hrefLabel="platform.openai.com/api-keys"
-                body="Open the API keys page and log in. If you don't have an account yet, sign up — it's free."
+                body="Open the API keys page and log in. If you don't have an account yet, sign up, it's free."
               />
 
               <Step
@@ -126,7 +126,7 @@ export function OpenAIKeyGuide({
                     <code className="font-mono text-[11px] px-1.5 py-0.5 bg-white border border-sand-200 rounded">
                       sk-
                     </code>{" "}
-                    — you&apos;ll only see it once, so paste it into Clarix
+                   , you&apos;ll only see it once, so paste it into Clarix
                     right after.
                   </>
                 }

@@ -85,7 +85,7 @@ const CHECKLIST: ChecklistItem[] = [
     icon: ShieldCheck,
     title: "Policies",
     description:
-      "Refunds, returns, privacy, terms, cancellation, SLA — anything customers may ask about.",
+      "Refunds, returns, privacy, terms, cancellation, SLA, anything customers may ask about.",
     examples: [
       "Refund / return policy",
       "Privacy & data handling",
@@ -106,11 +106,11 @@ const CHECKLIST: ChecklistItem[] = [
 ];
 
 const TIPS = [
-  "Write in **plain language** — the same words your customers use.",
+  "Write in **plain language**: the same words your customers use.",
   "Prefer **short, focused documents** over one giant wall of text.",
-  "Use **headings** (`## Section`) — they help the retriever find the right chunk.",
+  "Use **headings** (`## Section`), they help the agent find the right answer.",
   "Include **exact numbers, dates, and names**. Vague info → vague answers.",
-  "Keep content **up to date** — outdated knowledge is worse than missing knowledge.",
+  "Keep content **up to date**: outdated knowledge is worse than missing knowledge.",
 ];
 
 interface KBGuideButtonProps {

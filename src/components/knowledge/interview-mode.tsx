@@ -225,7 +225,7 @@ export function InterviewMode({
           </button>
         </div>
 
-        {/* Progress bar — only in questions stage */}
+        {/* Progress bar, only in questions stage */}
         {stage === "questions" && (
           <div className="mt-5">
             <div className="flex items-center justify-between text-xs font-semibold text-sand-500 tracking-tight mb-2">

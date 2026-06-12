@@ -6,12 +6,9 @@ import { DefaultChatTransport, type UIMessage } from "ai";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Send,
-  Sparkles,
   ShieldCheck,
   ShieldAlert,
   Shield,
-  ThumbsUp,
-  ThumbsDown,
   Search,
   PenLine,
   RotateCcw,
@@ -49,11 +46,10 @@ interface ChatInterfaceProps {
   onStartFresh?: () => void;
   /** Disables the Start fresh button (e.g. while a new thread is being created). */
   startFreshDisabled?: boolean;
-}
-
-interface FeedbackState {
-  rating: "up" | "down";
-  submitted: boolean;
+  /** Agent display name, drives the avatar initial and greeting voice. */
+  agentName?: string;
+  /** Greeting shown as the agent's first bubble on an empty thread. */
+  greeting?: string;
 }
 
 export function ChatInterface({
@@ -67,10 +63,11 @@ export function ChatInterface({
   subtitle,
   onStartFresh,
   startFreshDisabled,
+  agentName,
+  greeting,
 }: ChatInterfaceProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
-  const [feedback, setFeedback] = useState<Record<string, FeedbackState>>({});
   const [quickReplies, setQuickReplies] = useState<string[]>([]);
   const [loadingReplies, setLoadingReplies] = useState(false);
   const [activeSourceKey, setActiveSourceKey] = useState<string | null>(null);
@@ -155,25 +152,6 @@ export function ChatInterface({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMessage?.id, shouldFetchReplies]);
 
-  const submitFeedback = async (eventId: string, rating: "up" | "down") => {
-    setFeedback((prev) => ({
-      ...prev,
-      [eventId]: { rating, submitted: false },
-    }));
-    try {
-      await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventId, rating }),
-      });
-      setFeedback((prev) => ({
-        ...prev,
-        [eventId]: { rating, submitted: true },
-      }));
-    } catch {
-      // Silent — feedback is best-effort
-    }
-  };
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -210,17 +188,21 @@ export function ChatInterface({
     >
       {showHeader && (
         <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-sand-200 bg-white">
-          <div className="min-w-0">
-            {title && (
-              <p className="text-sm font-semibold text-sand-900 tracking-tight truncate">
-                {title}
-              </p>
-            )}
-            {subtitle && (
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="relative shrink-0">
+              <AgentAvatar name={agentName} className="w-8 h-8" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-status-success border-2 border-white" />
+            </div>
+            <div className="min-w-0">
+              {(agentName || title) && (
+                <p className="text-sm font-semibold text-sand-900 tracking-tight truncate">
+                  {agentName || title}
+                </p>
+              )}
               <p className="text-xs text-sand-500 mt-0.5 truncate">
-                {subtitle}
+                {subtitle || "Online · replies in seconds"}
               </p>
-            )}
+            </div>
           </div>
           {onStartFresh && (
             <Button
@@ -237,11 +219,13 @@ export function ChatInterface({
       )}
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto bg-sand-50">
         {messages.length === 0 ? (
-          <EmptyState
+          <GreetingBlock
+            agentName={agentName}
+            greeting={greeting}
             suggestions={suggestions}
-            onPick={(s) => setInput(s)}
+            onPick={handleQuickReply}
           />
         ) : (
           <div className="min-h-full flex flex-col justify-end p-6 space-y-5">
@@ -263,21 +247,24 @@ export function ChatInterface({
                   <MessageBubble
                     key={message.id}
                     message={message}
-                    feedback={feedback}
-                    onFeedback={submitFeedback}
                     activeSourceKey={activeSourceKey}
                     setActiveSourceKey={setActiveSourceKey}
+                    agentName={agentName}
                   />
                 );
               })}
             </AnimatePresence>
 
-            {/* Agent state indicator — single bubble, never overlaps with the
+            {/* Agent state indicator, single bubble, never overlaps with the
                 actual response. Shown while submitted (searching) or while
                 the assistant message exists but has no text yet (writing). */}
             <AnimatePresence>
-              {isSubmitted && <AgentStateBubble stage="searching" />}
-              {lastAssistantEmpty && <AgentStateBubble stage="writing" />}
+              {isSubmitted && (
+                <AgentStateBubble stage="searching" agentName={agentName} />
+              )}
+              {lastAssistantEmpty && (
+                <AgentStateBubble stage="writing" agentName={agentName} />
+              )}
             </AnimatePresence>
 
             {/* Quick replies */}
@@ -351,7 +338,10 @@ export function ChatInterface({
           </Button>
         </form>
         <p className="text-[10px] text-sand-400 mt-2 px-1 text-center">
-          Enter to send · Shift+Enter for newline
+          <span className="font-mono uppercase tracking-[0.14em]">
+            Powered by Clarix
+          </span>
+          {" · "}Enter to send
         </p>
       </div>
     </div>
@@ -360,41 +350,65 @@ export function ChatInterface({
 
 /* ---------- Subcomponents ---------- */
 
-function EmptyState({
+/** Small circular avatar for the agent, uses the first letter of its name. */
+function AgentAvatar({ name, className = "w-7 h-7" }: { name?: string; className?: string }) {
+  const initial = (name?.trim()[0] || "✳").toUpperCase();
+  return (
+    <div
+      className={`${className} rounded-full bg-sand-900 text-white flex items-center justify-center text-xs font-bold select-none shrink-0`}
+    >
+      {initial}
+    </div>
+  );
+}
+
+/**
+ * Empty-thread opener. Instead of a blank panel, the agent speaks first:
+ * a greeting bubble plus tappable starter questions that send immediately,
+ * so the first interaction already feels like a conversation.
+ */
+function GreetingBlock({
+  agentName,
+  greeting,
   suggestions,
   onPick,
 }: {
+  agentName?: string;
+  greeting?: string;
   suggestions: string[];
   onPick: (s: string) => void;
 }) {
+  const text =
+    greeting ||
+    (agentName
+      ? `Hi! I'm ${agentName}. Ask me anything, every answer comes straight from your knowledge.`
+      : "Hi! Ask me anything, every answer comes straight from your knowledge.");
   return (
-    <div className="h-full flex flex-col justify-end px-6 pb-8 pt-12">
+    <div className="min-h-full flex flex-col justify-end p-6">
       <motion.div
-        initial={{ scale: 0.85, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 220, damping: 18 }}
-        className="w-12 h-12 rounded-2xl bg-sand-900 flex items-center justify-center mb-5"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        className="flex items-start gap-2.5"
       >
-        <Sparkles className="w-5 h-5 text-white" />
+        <AgentAvatar name={agentName} className="w-7 h-7 mt-1" />
+        <div className="max-w-[85%] bg-white border border-sand-200 shadow-sand rounded-2xl rounded-bl-md px-4 py-3">
+          <p className="text-[0.9375rem] text-sand-800 leading-relaxed">
+            {text}
+          </p>
+        </div>
       </motion.div>
-      <h3 className="text-2xl font-bold text-sand-900 tracking-tighter mb-1.5">
-        Ask anything
-      </h3>
-      <p className="text-sm text-sand-500 mb-5 max-w-md">
-        Your agent answers from the knowledge base with inline citations and
-        confidence scoring.
-      </p>
 
       {suggestions.length > 0 && (
-        <div className="flex flex-wrap gap-2 max-w-xl">
+        <div className="flex flex-wrap gap-2 mt-4 pl-10">
           {suggestions.map((s, i) => (
             <motion.button
               key={s}
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + i * 0.05 }}
+              transition={{ delay: 0.25 + i * 0.07 }}
               onClick={() => onPick(s)}
-              className="text-xs font-semibold tracking-tight bg-sand-100 border border-sand-200 text-sand-700 px-3.5 py-2 rounded-full hover:bg-sand-150 hover:border-sand-300 transition-all"
+              className="text-xs font-semibold tracking-tight bg-white border border-sand-200 text-sand-700 px-3.5 py-2 rounded-full hover:bg-sand-900 hover:border-sand-900 hover:text-white transition-colors shadow-sand"
             >
               {s}
             </motion.button>
@@ -405,19 +419,26 @@ function EmptyState({
   );
 }
 
-function AgentStateBubble({ stage }: { stage: "searching" | "writing" }) {
+function AgentStateBubble({
+  stage,
+  agentName,
+}: {
+  stage: "searching" | "writing";
+  agentName?: string;
+}) {
   const label =
-    stage === "searching" ? "Searching knowledge base..." : "Writing reply...";
+    stage === "searching" ? "Looking it up…" : "Typing…";
   const Icon = stage === "searching" ? Search : PenLine;
 
   return (
     <motion.div
-      className="flex justify-start"
+      className="flex justify-start items-start gap-2.5"
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
     >
-      <div className="bg-sand-100 border border-sand-200 rounded-2xl rounded-bl-md px-4 py-2.5 flex items-center gap-2.5">
+      <AgentAvatar name={agentName} className="w-7 h-7 mt-0.5" />
+      <div className="bg-white border border-sand-200 shadow-sand rounded-2xl rounded-bl-md px-4 py-2.5 flex items-center gap-2.5">
         <motion.div
           animate={{ rotate: stage === "searching" ? 360 : 0 }}
           transition={{
@@ -452,16 +473,14 @@ function AgentStateBubble({ stage }: { stage: "searching" | "writing" }) {
 
 function MessageBubble({
   message,
-  feedback,
-  onFeedback,
   activeSourceKey,
   setActiveSourceKey,
+  agentName,
 }: {
   message: ChatMessage;
-  feedback: Record<string, FeedbackState>;
-  onFeedback: (eventId: string, rating: "up" | "down") => void;
   activeSourceKey: string | null;
   setActiveSourceKey: (k: string | null) => void;
+  agentName?: string;
 }) {
   const text = message.parts
     .filter((p): p is { type: "text"; text: string } => p.type === "text")
@@ -488,18 +507,17 @@ function MessageBubble({
   const metadata = message.metadata;
   const sources = metadata?.sources ?? [];
   const confidence = metadata?.confidence;
-  const eventId = metadata?.eventId;
-  const fb = eventId ? feedback[eventId] : undefined;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="flex justify-start"
+      className="flex justify-start items-start gap-2.5"
     >
-      <div className="max-w-[85%] w-fit">
-        <div className="bg-sand-100 border border-sand-200 text-sand-900 rounded-2xl rounded-bl-md px-4 py-3">
+      <AgentAvatar name={agentName} className="w-7 h-7 mt-1" />
+      <div className="max-w-[85%] w-fit min-w-0">
+        <div className="bg-white border border-sand-200 shadow-sand text-sand-900 rounded-2xl rounded-bl-md px-4 py-3">
           <CitedMarkdown text={text} sources={sources} />
 
           {/* Sources list */}
@@ -559,28 +577,9 @@ function MessageBubble({
           )}
         </div>
 
-        {/* Footer: confidence + feedback */}
-        {(confidence !== undefined || eventId) && (
-          <div className="flex items-center gap-2 mt-2 px-1 flex-wrap">
-            {confidence !== undefined && (
-              <ConfidenceBadge confidence={confidence} count={sources.length} />
-            )}
-            {eventId && (
-              <div className="ml-auto flex items-center gap-1">
-                <FeedbackButton
-                  active={fb?.rating === "up"}
-                  onClick={() => !fb && onFeedback(eventId, "up")}
-                  icon={ThumbsUp}
-                  label="Helpful"
-                />
-                <FeedbackButton
-                  active={fb?.rating === "down"}
-                  onClick={() => !fb && onFeedback(eventId, "down")}
-                  icon={ThumbsDown}
-                  label="Not helpful"
-                />
-              </div>
-            )}
+        {confidence !== undefined && (
+          <div className="flex items-center gap-2 mt-2 px-1">
+            <ConfidenceBadge confidence={confidence} count={sources.length} />
           </div>
         )}
       </div>
@@ -628,32 +627,6 @@ function ConfidenceBadge({
         </span>
       )}
     </div>
-  );
-}
-
-function FeedbackButton({
-  active,
-  onClick,
-  icon: Icon,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: typeof ThumbsUp;
-  label: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      className={`p-1.5 rounded-lg transition-all ${
-        active
-          ? "bg-sand-900 text-white"
-          : "text-sand-400 hover:bg-sand-100 hover:text-sand-700"
-      }`}
-    >
-      <Icon className="w-3.5 h-3.5" />
-    </button>
   );
 }
 

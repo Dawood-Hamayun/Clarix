@@ -1,0 +1,110 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "Clarix" [ref=e5] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e7]
+        - generic [ref=e12]: Clarix
+      - navigation [ref=e13]:
+        - paragraph [ref=e14]: Workspace
+        - link "Overview" [ref=e15] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e17]
+          - generic [ref=e22]: Overview
+        - link "Knowledge" [ref=e23] [cursor=pointer]:
+          - /url: /dashboard/knowledge
+          - img [ref=e24]
+          - generic [ref=e26]: Knowledge
+        - link "Conversations" [ref=e27] [cursor=pointer]:
+          - /url: /dashboard/conversations
+          - img [ref=e28]
+          - generic [ref=e30]: Conversations
+        - link "Playground" [ref=e31] [cursor=pointer]:
+          - /url: /dashboard/playground
+          - img [ref=e32]
+          - generic [ref=e34]: Playground
+        - link "Widget" [ref=e35] [cursor=pointer]:
+          - /url: /dashboard/widget
+          - img [ref=e36]
+          - generic [ref=e40]: Widget
+        - link "Install" [ref=e41] [cursor=pointer]:
+          - /url: /dashboard/integrations
+          - img [ref=e42]
+          - generic [ref=e44]: Install
+        - link "Settings" [ref=e45] [cursor=pointer]:
+          - /url: /dashboard/settings
+          - img [ref=e46]
+          - generic [ref=e49]: Settings
+      - link "A Acme Cloud Finish setup" [ref=e51] [cursor=pointer]:
+        - /url: /dashboard/settings
+        - generic [ref=e52]: A
+        - generic [ref=e53]:
+          - paragraph [ref=e54]: Acme Cloud
+          - paragraph [ref=e55]: Finish setup
+        - img [ref=e56]
+    - generic [ref=e60]:
+      - banner [ref=e61]:
+        - generic [ref=e63]:
+          - heading "Overview" [level=1] [ref=e64]
+          - paragraph [ref=e65]: How your agent is doing
+        - generic [ref=e67]:
+          - img
+          - textbox "Search or jump to…" [ref=e68]
+          - generic:
+            - img
+            - text: K
+      - main [ref=e69]:
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - paragraph [ref=e73]: Acme Cloud · Ava is on duty
+            - heading "Good morning." [level=1] [ref=e75]
+            - paragraph [ref=e76]: Everything is loaded and Ava is ready. Here's the tour.
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - generic [ref=e79]: "0"
+              - generic [ref=e80]: Conversations
+            - generic [ref=e81]:
+              - generic [ref=e82]: "0"
+              - generic [ref=e83]: Messages
+            - generic [ref=e84]:
+              - generic [ref=e85]: "0"
+              - generic [ref=e86]: Answers ready
+            - generic [ref=e87]:
+              - generic [ref=e88]: "0"
+              - generic [ref=e89]: Sources
+          - generic [ref=e90]:
+            - paragraph [ref=e91]: The tour · four stops
+            - generic [ref=e92]:
+              - link "01 Talk to Ava Ask her anything a customer would. Watch her cite her sources." [ref=e94] [cursor=pointer]:
+                - /url: /dashboard/playground
+                - generic [ref=e95]: "01"
+                - generic [ref=e96]: Talk to Ava
+                - generic [ref=e97]: Ask her anything a customer would. Watch her cite her sources.
+                - img [ref=e98]
+              - link "02 Read the conversations Every chat is logged here, exactly as a support team would see it." [ref=e101] [cursor=pointer]:
+                - /url: /dashboard/conversations
+                - generic [ref=e102]: "02"
+                - generic [ref=e103]: Read the conversations
+                - generic [ref=e104]: Every chat is logged here, exactly as a support team would see it.
+                - img [ref=e105]
+              - link "03 See what she knows The knowledge she answers from, organized by topic." [ref=e108] [cursor=pointer]:
+                - /url: /dashboard/knowledge
+                - generic [ref=e109]: "03"
+                - generic [ref=e110]: See what she knows
+                - generic [ref=e111]: The knowledge she answers from, organized by topic.
+                - img [ref=e112]
+              - link "04 Put her on a website One small snippet and the widget is live on any site." [ref=e115] [cursor=pointer]:
+                - /url: /dashboard/integrations
+                - generic [ref=e116]: "04"
+                - generic [ref=e117]: Put her on a website
+                - generic [ref=e118]: One small snippet and the widget is live on any site.
+                - img [ref=e119]
+          - generic [ref=e121]:
+            - paragraph [ref=e123]: Latest conversations
+            - paragraph [ref=e125]:
+              - text: Nothing yet. Take the first stop of the tour and
+              - link "say hello to Ava" [ref=e126] [cursor=pointer]:
+                - /url: /dashboard/playground
+              - text: .
+  - button "Open Next.js Dev Tools" [ref=e132] [cursor=pointer]:
+    - img [ref=e133]

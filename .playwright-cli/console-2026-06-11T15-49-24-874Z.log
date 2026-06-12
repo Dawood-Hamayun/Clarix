@@ -1,0 +1,16 @@
+[     336ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[     382ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  179491ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  179515ms] [LOG] [Fast Refresh] done in 81ms @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  225260ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  225527ms] [LOG] [Fast Refresh] done in 368ms @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  226656ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  226732ms] [LOG] [Fast Refresh] done in 177ms @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  234247ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  234327ms] [LOG] [Fast Refresh] done in 182ms @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  241286ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  241353ms] [LOG] [Fast Refresh] done in 168ms @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  522150ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  522378ms] [LOG] [Fast Refresh] done in 181ms @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  550035ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431
+[  550426ms] [LOG] [Fast Refresh] done in 452ms @ http://localhost:3000/_next/static/chunks/0n2u_next_dist_10a1nx~._.js:2431

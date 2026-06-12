@@ -77,7 +77,7 @@ export default function EmbedWidgetPage() {
         if (p) setConfig(p.widgetConfig);
       })
       .catch(() => {
-        // Silent — leave config null so we render a safe fallback.
+        // Silent, leave config null so we render a safe fallback.
       });
   }, []);
 
@@ -138,7 +138,7 @@ export default function EmbedWidgetPage() {
         state (messages, streaming status, transport, conversation id)
         persists across open/close. Previously we remounted on every
         close/reopen, which was why conversations appeared to disappear
-        then reappear only after sending a new message — the mount order
+        then reappear only after sending a new message, the mount order
         raced the hydration fetch. Visibility is now a pure CSS toggle.
       */}
       <ChatPanel
@@ -302,7 +302,7 @@ function ChatPanel({
           window.sessionStorage.setItem(storageKey, conv.id);
         }
       } catch {
-        /* silent — the widget still renders, just no persistence */
+        /* silent, the widget still renders, just no persistence */
       }
       setHydrated(true);
     }
@@ -322,7 +322,7 @@ function ChatPanel({
     [projectId, conversationId]
   );
 
-  // Stable chat id — only re-mounts when conversationId actually changes,
+  // Stable chat id, only re-mounts when conversationId actually changes,
   // not on every hydration tick. Previously we included
   // `initialMessages.length` in the key, which meant every append would
   // remount useChat and wipe its in-memory message buffer mid-stream.
@@ -408,7 +408,7 @@ function ChatPanel({
     }
   };
 
-  // On mobile, the loader iframe spans the full viewport width — so we drop
+  // On mobile, the loader iframe spans the full viewport width, so we drop
   // the max-width, the margin, and the rounded corners to get a true
   // edge-to-edge panel that doesn't look like a floating card on a phone.
   return (
@@ -581,7 +581,7 @@ function Bubble({
 
   if (message.role === "assistant") {
     if (!text) return null;
-    // Strip inline [1] / [2] citation markers — the widget does not render the
+    // Strip inline [1] / [2] citation markers, the widget does not render the
     // source list so they'd just be noise.
     const clean = text.replace(/\s?\[\d+\]/g, "");
     const eventId = message.metadata?.eventId;
@@ -730,7 +730,7 @@ function ResolutionDone({
       <div className="flex-1 min-w-0">
         <p className="text-xs font-semibold text-sand-900">
           {isResolved
-            ? "Marked as resolved — thanks for the feedback!"
+            ? "Marked as resolved, thanks for the feedback!"
             : "We'll pass this along so we can do better next time."}
         </p>
       </div>
