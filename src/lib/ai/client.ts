@@ -15,9 +15,9 @@ import { store } from "@/lib/db/store";
  *
  * Model ids are overridable via env so the host can pin whatever the
  * current free tier offers:
- *   CLARIX_CHAT_MODEL       (default gemini-2.0-flash  / gpt-4o)
- *   CLARIX_FAST_MODEL       (default gemini-2.0-flash-lite / gpt-4o-mini)
- *   CLARIX_EMBEDDING_MODEL  (default text-embedding-004 / text-embedding-3-small)
+ *   CLARIX_CHAT_MODEL       (default gemini-2.5-flash / gpt-4o)
+ *   CLARIX_FAST_MODEL       (default gemini-2.5-flash-lite / gpt-4o-mini)
+ *   CLARIX_EMBEDDING_MODEL  (default gemini-embedding-001 / text-embedding-3-small)
  */
 
 export function resolveGeminiKey(): string | null {
@@ -68,7 +68,7 @@ export function getOpenAIProvider(projectId: string): OpenAIProvider {
 export function getChatModel(projectId: string): LanguageModel {
   const google = googleProvider();
   if (google) {
-    return google(process.env.CLARIX_CHAT_MODEL || "gemini-2.0-flash");
+    return google(process.env.CLARIX_CHAT_MODEL || "gemini-2.5-flash");
   }
   return getOpenAIProvider(projectId)(
     process.env.CLARIX_CHAT_MODEL || "gpt-4o"
@@ -79,7 +79,7 @@ export function getChatModel(projectId: string): LanguageModel {
 export function getFastModel(projectId: string): LanguageModel {
   const google = googleProvider();
   if (google) {
-    return google(process.env.CLARIX_FAST_MODEL || "gemini-2.0-flash-lite");
+    return google(process.env.CLARIX_FAST_MODEL || "gemini-2.5-flash-lite");
   }
   return getOpenAIProvider(projectId)(
     process.env.CLARIX_FAST_MODEL || "gpt-4o-mini"
@@ -91,7 +91,7 @@ export function getEmbeddingModel(projectId: string): EmbeddingModel {
   const google = googleProvider();
   if (google) {
     return google.textEmbedding(
-      process.env.CLARIX_EMBEDDING_MODEL || "text-embedding-004"
+      process.env.CLARIX_EMBEDDING_MODEL || "gemini-embedding-001"
     );
   }
   return getOpenAIProvider(projectId).textEmbedding(
