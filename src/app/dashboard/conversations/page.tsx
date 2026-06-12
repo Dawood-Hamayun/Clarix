@@ -97,32 +97,6 @@ export default function ConversationsPage() {
             />
           </div>
 
-          <div className="flex items-center gap-1 bg-white border border-sand-200 rounded-xl p-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <FilterPill
-              active={statusFilter === "all"}
-              onClick={() => setStatusFilter("all")}
-              label="All"
-              count={counts.all}
-            />
-            <FilterPill
-              active={statusFilter === "resolved"}
-              onClick={() => setStatusFilter("resolved")}
-              label="Resolved"
-              count={counts.resolved}
-            />
-            <FilterPill
-              active={statusFilter === "unresolved"}
-              onClick={() => setStatusFilter("unresolved")}
-              label="Unresolved"
-              count={counts.unresolved}
-            />
-            <FilterPill
-              active={statusFilter === "unrated"}
-              onClick={() => setStatusFilter("unrated")}
-              label="Unrated"
-              count={counts.unrated}
-            />
-          </div>
         </div>
       )}
 
@@ -212,7 +186,7 @@ export default function ConversationsPage() {
                               <span className="hidden sm:inline text-xs font-mono text-sand-500">
                                 {conv.metadata.messageCount} msgs
                               </span>
-                              <StatusBadge status={conv.status ?? "unrated"} />
+                              <span className="label-mono text-sand-400 shrink-0">{conv.metadata.messageCount} msgs</span>
                             </div>
                           </Link>
                         </motion.div>
@@ -272,7 +246,7 @@ export default function ConversationsPage() {
 /**
  * Pill that renders the feedback-derived conversation status. Kept as
  * its own component so the label, color, and tooltip copy are in one
- * place — the dashboard and the detail page both use it.
+ * place, the dashboard and the detail page both use it.
  */
 function StatusBadge({ status }: { status: ConversationStatus }) {
   const config: Record<

@@ -1,0 +1,110 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "Clarix" [ref=e5] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e7]
+        - generic [ref=e12]: Clarix
+      - navigation [ref=e13]:
+        - paragraph [ref=e14]: Workspace
+        - link "Overview" [ref=e15] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e16]
+          - generic [ref=e21]: Overview
+        - link "Knowledge" [ref=e22] [cursor=pointer]:
+          - /url: /dashboard/knowledge
+          - img [ref=e23]
+          - generic [ref=e25]: Knowledge
+        - link "Conversations" [ref=e26] [cursor=pointer]:
+          - /url: /dashboard/conversations
+          - img [ref=e27]
+          - generic [ref=e29]: Conversations
+        - link "Playground" [ref=e30] [cursor=pointer]:
+          - /url: /dashboard/playground
+          - img [ref=e32]
+          - generic [ref=e34]: Playground
+        - link "Widget" [ref=e35] [cursor=pointer]:
+          - /url: /dashboard/widget
+          - img [ref=e36]
+          - generic [ref=e40]: Widget
+        - link "Install" [ref=e41] [cursor=pointer]:
+          - /url: /dashboard/integrations
+          - img [ref=e42]
+          - generic [ref=e44]: Install
+        - link "Settings" [ref=e45] [cursor=pointer]:
+          - /url: /dashboard/settings
+          - img [ref=e46]
+          - generic [ref=e49]: Settings
+      - link "Y Agent online Your Company Agent online" [ref=e51] [cursor=pointer]:
+        - /url: /dashboard/settings
+        - generic [ref=e52]:
+          - text: "Y"
+          - generic "Agent online" [ref=e53]
+        - generic [ref=e54]:
+          - paragraph [ref=e55]: Your Company
+          - paragraph [ref=e56]: Agent online
+        - img [ref=e57]
+    - generic [ref=e61]:
+      - banner [ref=e62]:
+        - generic [ref=e64]:
+          - heading "Playground" [level=1] [ref=e65]
+          - paragraph [ref=e66]: Talk to your agent
+        - generic [ref=e68]:
+          - img
+          - textbox "Search or jump to…" [ref=e69]
+          - generic:
+            - img
+            - text: K
+      - main [ref=e70]:
+        - generic [ref=e73]:
+          - generic [ref=e75]:
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - generic [ref=e79]: A
+                - generic [ref=e81]:
+                  - paragraph [ref=e82]: Ava
+                  - paragraph [ref=e83]: New session, ask anything to get started
+              - button "Start fresh" [ref=e84] [cursor=pointer]:
+                - img [ref=e85]
+                - text: Start fresh
+            - generic [ref=e90]:
+              - generic [ref=e91]: A
+              - paragraph [ref=e93]: Hi! How can I help you today?
+            - generic [ref=e94]:
+              - generic [ref=e95]:
+                - textbox "Ask anything…" [ref=e96]
+                - button [disabled] [ref=e97]:
+                  - img [ref=e98]
+              - paragraph [ref=e101]: Powered by Clarix · Enter to send
+          - generic [ref=e102]:
+            - generic [ref=e103]:
+              - generic [ref=e105]:
+                - img [ref=e106]
+                - heading "What it looked up" [level=3] [ref=e110]
+              - paragraph [ref=e112]: Ask a question and watch the agent show its work here.
+            - generic [ref=e113]:
+              - heading "How it answers" [level=3] [ref=e114]
+              - list [ref=e115]:
+                - listitem [ref=e116]:
+                  - generic [ref=e117]: "1"
+                  - text: It reads the question, like a person would
+                - listitem [ref=e118]:
+                  - generic [ref=e119]: "2"
+                  - text: Finds the most relevant parts of your knowledge
+                - listitem [ref=e120]:
+                  - generic [ref=e121]: "3"
+                  - text: Answers from that, and only that. Never invents
+            - generic [ref=e122]:
+              - generic [ref=e123]:
+                - img [ref=e124]
+                - heading "Knowledge Base" [level=3] [ref=e126]
+              - generic [ref=e127]:
+                - generic [ref=e128]:
+                  - paragraph [ref=e129]: "16"
+                  - paragraph [ref=e130]: Sources
+                - generic [ref=e131]:
+                  - paragraph [ref=e132]: "44"
+                  - paragraph [ref=e133]: Answers ready
+  - button "Open Next.js Dev Tools" [ref=e139] [cursor=pointer]:
+    - img [ref=e140]
+  - alert [ref=e143]

@@ -1,7 +1,7 @@
 import { streamText, convertToModelMessages, type UIMessage } from "ai";
 import { NextResponse } from "next/server";
 import {
-  getOpenAIProvider,
+  getChatModel,
   MissingOpenAIKeyError,
 } from "@/lib/ai/client";
 import { retrieveContext } from "@/lib/ai/rag";
@@ -66,9 +66,9 @@ export async function POST(req: Request) {
   // Resolve the project-scoped OpenAI provider up-front so we can return
   // a clean 400 when the user hasn't added a key yet, instead of 500'ing
   // deep inside retrieveContext or streamText.
-  let openai;
+  let model;
   try {
-    openai = getOpenAIProvider(projectId);
+    model = getChatModel(projectId);
   } catch (err) {
     if (err instanceof MissingOpenAIKeyError) {
       return NextResponse.json(
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
   const modelMessages = await convertToModelMessages(messages);
 
   const result = streamText({
-    model: openai("gpt-4o"),
+    model,
     system: systemPrompt,
     messages: modelMessages,
     onFinish: async ({ text, usage }) => {

@@ -34,7 +34,7 @@ const DEFAULT_CATEGORIES: Omit<
   {
     slug: "products",
     name: "Products & Services",
-    description: "What you offer — features, capabilities, use cases",
+    description: "What you offer, features, capabilities, use cases",
     icon: "Package",
     order: 2,
     system: true,
@@ -145,7 +145,7 @@ class MemoryStore {
       if (!this.dirty) return;
       this.dirty = false;
       const snapshot = this.toSnapshot();
-      // Fire-and-forget — persistence failures must never break the request.
+      // Fire-and-forget, persistence failures must never break the request.
       saveSnapshot(snapshot).catch((err) => {
         console.warn("[store] flush failed:", err);
       });
@@ -233,13 +233,13 @@ class MemoryStore {
     const projectId = "proj_demo";
     this.projects.set(projectId, {
       id: projectId,
-      name: "Your Company",
+      name: "Acme Cloud",
       description: "",
       widgetConfig: {
         primaryColor: "#18181B",
-        greeting: "Hi! How can I help you today?",
+        greeting: "Hi! I'm Ava, Acme Cloud's support agent. How can I help?",
         position: "bottom-right",
-        companyName: "Your Company",
+        companyName: "Acme Cloud",
         launcherLabel: "Chat with us",
         radius: "soft",
       },
@@ -451,7 +451,7 @@ class MemoryStore {
   /**
    * Derive a conversation's status. Priority order:
    *
-   * 1. **Explicit customer choice** (`metadata.customerResolution`) —
+   * 1. **Explicit customer choice** (`metadata.customerResolution`),
    *    wins over everything. When someone clicks "Yes, this helped" at
    *    the end of a chat, that's the strongest possible signal.
    * 2. **Per-message thumbs feedback** aggregated across query events:
@@ -639,11 +639,11 @@ class MemoryStore {
     };
   }
 
-  // Analytics (derived from real data only — no randomness)
+  // Analytics (derived from real data only, no randomness)
   getAnalytics(projectId: string): AnalyticsData {
     // Only count conversations that actually have messages. Empty shells
     // are created up-front by the playground + embed widget so the first
-    // chat message has somewhere to land — they shouldn't show up in
+    // chat message has somewhere to land, they shouldn't show up in
     // metrics until the visitor actually says something.
     const conversations = this.getConversations(projectId).filter(
       (c) => c.metadata.messageCount > 0
@@ -654,7 +654,7 @@ class MemoryStore {
     );
 
     // Resolution is derived from thumbs feedback via `getConversationStatus`
-    // — the single source of truth used by both this metric and the
+    //, the single source of truth used by both this metric and the
     // "Resolved" pill on the conversations list. Conversations with
     // zero ratings are *excluded* from both numerator and denominator
     // so the rate isn't diluted by silent lurkers who never reacted
@@ -669,7 +669,7 @@ class MemoryStore {
       if (status === "resolved") resolvedConversations += 1;
     }
 
-    // Messages per day (last 7 days) — strictly real counts, no fake filler
+    // Messages per day (last 7 days), strictly real counts, no fake filler
     const days: { date: string; count: number }[] = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
@@ -697,7 +697,7 @@ class MemoryStore {
   }
 }
 
-// Singleton — cached across hot reloads in dev to survive `next dev` rebuilds.
+// Singleton, cached across hot reloads in dev to survive `next dev` rebuilds.
 declare global {
   var __clarixStore: MemoryStore | undefined;
 }

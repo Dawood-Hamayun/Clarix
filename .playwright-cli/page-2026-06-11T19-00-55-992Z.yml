@@ -1,0 +1,29 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - link "Clarix" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - img [ref=e7]
+        - generic [ref=e10]: Clarix
+    - main [ref=e11]:
+      - generic [ref=e14]:
+        - button "Skip →" [ref=e20] [cursor=pointer]
+        - generic [ref=e22]:
+          - paragraph [ref=e23]: Act 1 · The knowledge
+          - heading "First, it learns the business." [level=1] [ref=e24]
+          - generic [ref=e26]:
+            - paragraph [ref=e27]: "Loading the sample company: Acme Cloud"
+            - generic [ref=e28]:
+              - generic [ref=e29]:
+                - generic [ref=e30]: Pricing & plans
+                - generic [ref=e31]: 14 answers ✓
+              - generic [ref=e32]:
+                - generic [ref=e33]: Product & features
+                - generic [ref=e34]: 21 answers ✓
+              - generic [ref=e35]:
+                - generic [ref=e36]: Security & privacy
+                - generic [ref=e37]: 12 answers ✓
+            - paragraph [ref=e38]: 47 answers ready. Yours would load the same way
+        - paragraph [ref=e39]: Click to skip ahead
+  - button "Open Next.js Dev Tools" [ref=e45] [cursor=pointer]:
+    - img [ref=e46]

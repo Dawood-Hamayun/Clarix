@@ -151,7 +151,7 @@ export async function retrieveContext(
   }
 
   // Wider candidate pool so the category boost can re-rank meaningfully.
-  // A low threshold is intentional — we'd rather give the model noisy-but-
+  // A low threshold is intentional, we'd rather give the model noisy-but-
   // related context than refuse outright. The model is instructed to ignore
   // irrelevant blocks.
   let candidates = await vectorStore.search(

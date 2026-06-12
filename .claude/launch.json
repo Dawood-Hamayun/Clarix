@@ -1,0 +1,24 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "clarix-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "alto",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/dawoodhamayun/Projects/alto", "run", "dev", "--", "-p", "3100"],
+      "port": 3100
+    },
+    {
+      "name": "portfolio",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/dawoodhamayun/Projects/dawood-portfolio", "run", "dev", "--", "-p", "3200"],
+      "port": 3200
+    }
+  ]
+}

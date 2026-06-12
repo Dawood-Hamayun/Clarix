@@ -40,7 +40,7 @@ export function computeKBHealth(projectId: string): KBHealthReport {
     message = "Add your first source to teach your agent.";
   } else if (readyCount < 3) {
     status = "starting";
-    message = "Good start — add a few more sources for broader coverage.";
+    message = "Good start, add a few more sources for broader coverage.";
   } else if (readyCount < 6) {
     status = "ready";
     message = "Your agent has enough material to answer most questions.";
@@ -52,7 +52,7 @@ export function computeKBHealth(projectId: string): KBHealthReport {
   if (errorSources.length > 0) {
     message = `${errorSources.length} source${
       errorSources.length === 1 ? "" : "s"
-    } failed to process — retry or replace them.`;
+    } failed to process, retry or replace them.`;
   } else if (processingSources.length > 0) {
     message = `${processingSources.length} source${
       processingSources.length === 1 ? "" : "s"

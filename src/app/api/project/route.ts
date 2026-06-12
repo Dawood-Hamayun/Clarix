@@ -1,17 +1,25 @@
 import { NextResponse } from "next/server";
 import { store } from "@/lib/db/store";
+import { resolveGeminiKey } from "@/lib/ai/client";
+import { isDemoLocked } from "@/lib/demo-mode";
 import type { Project, PublicProject } from "@/lib/db/types";
 
 /**
  * Strip the raw OpenAI key before sending a project to the browser.
  * Replaces it with a boolean flag the UI can use to decide whether
- * to show "Add API key" vs. "Key configured".
+ * to show "Add API key" vs. "Key configured". An environment-level
+ * Gemini or OpenAI key counts as configured, the UI never needs to
+ * know which provider is behind it.
  */
 function toPublicProject(project: Project): PublicProject {
   const { openAIApiKey, ...rest } = project;
+  const hasEnvKey =
+    resolveGeminiKey() !== null ||
+    Boolean(process.env.OPENAI_API_KEY?.trim());
   return {
     ...rest,
-    hasOpenAIApiKey: Boolean(openAIApiKey && openAIApiKey.trim()),
+    hasOpenAIApiKey: Boolean(openAIApiKey && openAIApiKey.trim()) || hasEnvKey,
+    demoLocked: isDemoLocked(),
   };
 }
 
@@ -27,6 +35,12 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+  if (isDemoLocked()) {
+    return NextResponse.json(
+      { error: "This demo workspace is locked.", code: "demo_locked" },
+      { status: 403 }
+    );
+  }
   await store.ready();
   const body = await req.json();
   const {
@@ -72,6 +86,12 @@ export async function PATCH(req: Request) {
  * "Delete project" danger-zone button in settings.
  */
 export async function DELETE() {
+  if (isDemoLocked()) {
+    return NextResponse.json(
+      { error: "This demo workspace is locked.", code: "demo_locked" },
+      { status: 403 }
+    );
+  }
   await store.ready();
   store.resetAll();
   await store.flushNow();

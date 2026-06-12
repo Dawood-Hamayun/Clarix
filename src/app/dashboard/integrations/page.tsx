@@ -47,7 +47,7 @@ const FRAMEWORKS: Framework[] = [
     id: "html",
     label: "Plain HTML",
     icon: Globe,
-    description: "Drop into any HTML page — Wix, Carrd, static sites, anywhere.",
+    description: "Drop into any HTML page, Wix, Carrd, static sites, anywhere.",
     language: "html",
     placement: "Paste just before the closing </body> tag.",
     build: ({ origin, projectId, position }) =>
@@ -93,7 +93,7 @@ export default function RootLayout({
     id: "react",
     label: "React / Vite",
     icon: Zap,
-    description: "Plain React app — inject once from your root component.",
+    description: "Plain React app, inject once from your root component.",
     language: "jsx",
     placement: "Inside your root App component (fires once on mount).",
     build: ({ origin, projectId, position }) =>
@@ -150,7 +150,7 @@ export default function App() {
     id: "webflow",
     label: "Webflow",
     icon: Globe,
-    description: "Site-wide custom code — one line, no plan upgrade needed.",
+    description: "Site-wide custom code, one line, no plan upgrade needed.",
     language: "html",
     placement:
       "Project Settings → Custom Code → Footer Code. Publish to apply.",
@@ -263,7 +263,7 @@ export default function IntegrationsPage() {
           Ship Clarix anywhere
         </h1>
         <p className="text-sm sm:text-base text-sand-600 mt-2 max-w-2xl">
-          One script tag powers the entire chat widget — launcher, chat panel,
+          One script tag powers the entire chat widget, launcher, chat panel,
           streaming, and persistence. Pick your stack and paste the snippet.
           It&apos;s already wired to your live project.
         </p>
@@ -278,7 +278,7 @@ export default function IntegrationsPage() {
           <span className="text-xs text-sand-500 truncate">
             Workspace:{" "}
             <span className="font-semibold text-sand-700">
-              {project?.widgetConfig.companyName || project?.name || "Your workspace"}
+              {project?.widgetConfig.companyName || project?.name || "Acme Cloud"}
             </span>
           </span>
         </div>
@@ -377,7 +377,7 @@ export default function IntegrationsPage() {
               value={
                 project?.widgetConfig.companyName ||
                 project?.name ||
-                "Your workspace"
+                "Acme Cloud"
               }
             />
             <SnippetMeta

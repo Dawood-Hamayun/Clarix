@@ -34,7 +34,7 @@ function decodeHtmlEntities(input: string): string {
     quot: '"',
     apos: "'",
     hellip: "…",
-    mdash: "—",
+    mdash: "-",
     ndash: "–",
     lsquo: "\u2018",
     rsquo: "\u2019",
@@ -92,7 +92,7 @@ async function scrapeUrl(url: string): Promise<string> {
   const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   const title = titleMatch ? decodeHtmlEntities(stripTags(titleMatch[1])).trim() : "";
 
-  // Prefer the <main> or <article> region if present — gives much cleaner
+  // Prefer the <main> or <article> region if present, gives much cleaner
   // output on sites where the real content lives there.
   let body = html;
   const mainMatch =

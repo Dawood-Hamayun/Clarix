@@ -1,52 +1,46 @@
-import { getOpenAIClient } from "./client";
+import { embed, embedMany } from "ai";
+import { getEmbeddingModel } from "./client";
 
 /**
- * OpenAI embedding model. `text-embedding-3-small` hits a good balance
- * between cost ($0.02 / 1M tokens) and quality for RAG retrieval.
+ * Provider-neutral embeddings for the RAG pipeline. The model comes from
+ * getEmbeddingModel (Gemini text-embedding-004 when GEMINI_API_KEY is
+ * set, otherwise OpenAI text-embedding-3-small).
+ *
+ * Note: vectors from different providers aren't comparable. If you switch
+ * providers on an existing workspace, re-seed or re-process sources so
+ * stored chunk vectors match the query embeddings.
  */
-const EMBEDDING_MODEL = "text-embedding-3-small";
 
-/** Hard cap per input string. Matches OpenAI's per-input token budget. */
+/** Hard cap per input string, keeps each input inside model token budgets. */
 const MAX_INPUT_CHARS = 8000;
 
-/** Max items per embeddings.create batch (OpenAI accepts up to 2048). */
-const BATCH_SIZE = 100;
-
 /**
- * Generate an embedding vector for a single string, using the OpenAI key
- * resolved from the given project.
+ * Generate an embedding vector for a single string, using the model
+ * resolved for the given project.
  */
 export async function generateEmbedding(
   text: string,
   projectId: string
 ): Promise<number[]> {
-  const openai = getOpenAIClient(projectId);
-  const response = await openai.embeddings.create({
-    model: EMBEDDING_MODEL,
-    input: text.slice(0, MAX_INPUT_CHARS),
+  const { embedding } = await embed({
+    model: getEmbeddingModel(projectId),
+    value: text.slice(0, MAX_INPUT_CHARS),
   });
-  return response.data[0].embedding;
+  return embedding;
 }
 
 /**
- * Generate embeddings for many strings at once. Batches requests so a
- * large source (hundreds of chunks) only triggers a handful of API calls.
+ * Generate embeddings for many strings at once. The AI SDK batches
+ * requests to the provider's per-call limit automatically.
  */
 export async function generateEmbeddings(
   texts: string[],
   projectId: string
 ): Promise<number[][]> {
-  const openai = getOpenAIClient(projectId);
-  const results: number[][] = [];
-  for (let i = 0; i < texts.length; i += BATCH_SIZE) {
-    const batch = texts
-      .slice(i, i + BATCH_SIZE)
-      .map((t) => t.slice(0, MAX_INPUT_CHARS));
-    const response = await openai.embeddings.create({
-      model: EMBEDDING_MODEL,
-      input: batch,
-    });
-    results.push(...response.data.map((d) => d.embedding));
-  }
-  return results;
+  if (texts.length === 0) return [];
+  const { embeddings } = await embedMany({
+    model: getEmbeddingModel(projectId),
+    values: texts.map((t) => t.slice(0, MAX_INPUT_CHARS)),
+  });
+  return embeddings;
 }

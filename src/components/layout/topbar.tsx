@@ -22,22 +22,22 @@ import { cn } from "@/lib/utils/cn";
 
 const titles: Record<string, string> = {
   "/dashboard": "Overview",
-  "/dashboard/knowledge": "Knowledge Base",
+  "/dashboard/knowledge": "Knowledge",
   "/dashboard/conversations": "Conversations",
   "/dashboard/playground": "Playground",
   "/dashboard/widget": "Widget",
-  "/dashboard/integrations": "Integrations",
+  "/dashboard/integrations": "Install",
   "/dashboard/settings": "Settings",
 };
 
 const subtitles: Record<string, string> = {
-  "/dashboard": "Your agent's command center",
-  "/dashboard/knowledge": "Organize what your agent knows",
-  "/dashboard/conversations": "Every customer interaction",
+  "/dashboard": "How your agent is doing",
+  "/dashboard/knowledge": "What your agent knows",
+  "/dashboard/conversations": "Every customer chat, logged",
   "/dashboard/playground": "Talk to your agent",
-  "/dashboard/widget": "Embed the chat widget anywhere",
-  "/dashboard/integrations": "Drop the chat widget anywhere",
-  "/dashboard/settings": "Agent identity and configuration",
+  "/dashboard/widget": "Make it look like your brand",
+  "/dashboard/integrations": "Put it on your website",
+  "/dashboard/settings": "Identity and configuration",
 };
 
 interface SearchItem {
@@ -100,10 +100,10 @@ const SEARCH_ITEMS: SearchItem[] = [
   },
   {
     label: "Settings",
-    description: "Agent identity, OpenAI key, categories",
+    description: "Agent identity, keys, categories",
     href: "/dashboard/settings",
     icon: Settings,
-    keywords: ["config", "settings", "api key", "openai", "identity"],
+    keywords: ["config", "settings", "api key", "identity"],
   },
 ];
 
@@ -126,8 +126,8 @@ export function Topbar() {
   const subtitle = subtitles[titleKey];
 
   // Close when the route changes. This is a legitimate "reset on external
-  // input change" pattern — the pathname is driven by the router, not React
-  // state — so the set-state-in-effect rule doesn't apply here.
+  // input change" pattern, the pathname is driven by the router, not React
+  // state, so the set-state-in-effect rule doesn't apply here.
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     setOpen(false);
@@ -226,7 +226,7 @@ export function Topbar() {
     <>
       <header className="h-16 sm:h-20 border-b border-sand-200 bg-sand-50/90 backdrop-blur-md flex items-center justify-between gap-3 px-4 sm:px-6 md:px-10 sticky top-0 z-20">
         <div className="flex items-center gap-2 min-w-0">
-          {/* Hamburger — opens the sidebar drawer on mobile only */}
+          {/* Hamburger, opens the sidebar drawer on mobile only */}
           <button
             onClick={toggleSidebar}
             className="md:hidden w-10 h-10 -ml-2 rounded-lg text-sand-700 hover:bg-sand-100 transition-colors flex items-center justify-center shrink-0"
@@ -239,7 +239,7 @@ export function Topbar() {
               {title}
             </h1>
             {subtitle && (
-              <p className="hidden sm:block text-sm text-sand-500 mt-1.5 truncate">
+              <p className="hidden sm:block label-mono text-sand-400 mt-1.5 truncate">
                 {subtitle}
               </p>
             )}
@@ -270,7 +270,7 @@ export function Topbar() {
               onFocus={() => setOpen(true)}
               onKeyDown={onKeyDown}
               placeholder="Search or jump to…"
-              className="w-56 lg:w-72 bg-white border border-sand-200 rounded-xl pl-10 pr-12 py-2.5 text-sm text-sand-800 placeholder:text-sand-400 focus:outline-none focus:border-sand-900 focus:ring-2 focus:ring-sand-900/10 transition-all"
+              className="w-56 lg:w-72 bg-white border border-sand-200 rounded-full pl-10 pr-12 py-2.5 text-sm text-sand-800 placeholder:text-sand-400 focus:outline-none focus:border-sand-900 focus:ring-2 focus:ring-sand-900/10 transition-all"
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-[10px] font-semibold text-sand-500 bg-sand-100 border border-sand-200 rounded px-1.5 py-0.5 pointer-events-none">
               <Command className="w-2.5 h-2.5" />K

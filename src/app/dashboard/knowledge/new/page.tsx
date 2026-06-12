@@ -178,7 +178,7 @@ function NewKnowledgeInner() {
               Category
               {activeCategory && (
                 <span className="text-sand-500 font-normal ml-2">
-                  — {activeCategory.description}
+                 , {activeCategory.description}
                 </span>
               )}
             </label>
@@ -220,7 +220,7 @@ function NewKnowledgeInner() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-base sm:text-lg font-bold tracking-tight">
-                      Guide me — I&apos;ll interview you
+                      Guide me, I&apos;ll interview you
                     </span>
                     <span className="text-[0.6875rem] font-bold uppercase tracking-wide bg-white/15 px-2 py-0.5 rounded-full">
                       Recommended

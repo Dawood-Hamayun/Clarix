@@ -1,0 +1,311 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - link "Clarix®" [ref=e5] [cursor=pointer]:
+          - /url: /
+        - generic [ref=e6]:
+          - link "Problem" [ref=e7] [cursor=pointer]:
+            - /url: "#problem"
+          - link "Method" [ref=e8] [cursor=pointer]:
+            - /url: "#method"
+          - link "Proof" [ref=e9] [cursor=pointer]:
+            - /url: "#proof"
+          - link "Numbers" [ref=e10] [cursor=pointer]:
+            - /url: "#numbers"
+          - link "FAQ" [ref=e11] [cursor=pointer]:
+            - /url: "#faq"
+        - generic [ref=e12]:
+          - link "Sign in" [ref=e13] [cursor=pointer]:
+            - /url: /dashboard
+          - link "Try the demo" [ref=e14] [cursor=pointer]:
+            - /url: /onboarding
+            - button "Try the demo" [ref=e15]
+    - banner [ref=e16]:
+      - generic [ref=e18]:
+        - generic [ref=e19]: The AI support agent for teams that answer to customers
+        - generic [ref=e20]: Live in minutes
+      - heading "Every customer question, answered in seconds." [level=1] [ref=e21]:
+        - generic [ref=e22]: Every customer question,
+        - generic [ref=e23]:
+          - text: answered in
+          - emphasis [ref=e24]: seconds.
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - paragraph [ref=e27]: Clarix learns your business, then answers your customers instantly. Day and night. Your team keeps the hard ones.
+          - generic [ref=e28]:
+            - link "Explore the full demo" [ref=e29] [cursor=pointer]:
+              - /url: /onboarding
+              - button "Explore the full demo" [ref=e30]
+            - link "Watch it work ↓" [ref=e31] [cursor=pointer]:
+              - /url: "#demo"
+        - list [ref=e32]:
+          - listitem [ref=e33]: 70% of questions resolved instantly
+          - listitem [ref=e35]: First reply in ~3 seconds
+          - listitem [ref=e37]: 24/7, no extra hires
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]: "Live demo: it types by itself, then it's all yours"
+          - generic [ref=e43]: "Sample company: Acme Cloud"
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - generic [ref=e47]: A
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - text: Ava
+                - generic [ref=e50]: · Acme Cloud
+              - generic [ref=e53]: Online
+            - generic [ref=e54]: Live demo
+            - button "Replay demo" [ref=e55] [cursor=pointer]:
+              - img [ref=e56]
+          - paragraph [ref=e61]: Demo starting…
+          - generic [ref=e63]:
+            - textbox "Watch the demo…" [disabled] [ref=e64]
+            - button "Send" [disabled] [ref=e65]:
+              - img [ref=e66]
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - generic [ref=e72]: Answers with sources
+          - generic [ref=e73]: ✺
+        - generic [ref=e74]:
+          - generic [ref=e75]: Honest human handoff
+          - generic [ref=e76]: ✺
+        - generic [ref=e77]:
+          - generic [ref=e78]: Never trains on your data
+          - generic [ref=e79]: ✺
+        - generic [ref=e80]:
+          - generic [ref=e81]: Your tone, your brand
+          - generic [ref=e82]: ✺
+        - generic [ref=e83]:
+          - generic [ref=e84]: Live in minutes
+          - generic [ref=e85]: ✺
+        - generic [ref=e86]:
+          - generic [ref=e87]: No hallucinations
+          - generic [ref=e88]: ✺
+      - generic [ref=e89]:
+        - generic [ref=e90]:
+          - generic [ref=e91]: Answers with sources
+          - generic [ref=e92]: ✺
+        - generic [ref=e93]:
+          - generic [ref=e94]: Honest human handoff
+          - generic [ref=e95]: ✺
+        - generic [ref=e96]:
+          - generic [ref=e97]: Never trains on your data
+          - generic [ref=e98]: ✺
+        - generic [ref=e99]:
+          - generic [ref=e100]: Your tone, your brand
+          - generic [ref=e101]: ✺
+        - generic [ref=e102]:
+          - generic [ref=e103]: Live in minutes
+          - generic [ref=e104]: ✺
+        - generic [ref=e105]:
+          - generic [ref=e106]: No hallucinations
+          - generic [ref=e107]: ✺
+    - generic [ref=e109]:
+      - generic [ref=e111]:
+        - generic [ref=e112]: "01"
+        - generic [ref=e113]: The problem
+      - generic [ref=e114]:
+        - heading "Support doesn't scale. Clarix does." [level=2] [ref=e116]:
+          - text: Support doesn't scale.
+          - text: Clarix does.
+        - generic [ref=e117]:
+          - generic [ref=e119]:
+            - paragraph [ref=e120]: Customers wait hours for a first reply.
+            - paragraph [ref=e121]: Seconds now. 3am Sunday included.
+          - generic [ref=e123]:
+            - paragraph [ref=e124]: Your team answers the same twenty questions on repeat.
+            - paragraph [ref=e125]: Clarix takes the repeats. Your team does real work.
+          - generic [ref=e127]:
+            - paragraph [ref=e128]: Generic chatbots invent answers.
+            - paragraph [ref=e129]: Clarix cites its source, or says it doesn't know.
+    - generic [ref=e131]:
+      - generic [ref=e133]:
+        - generic [ref=e134]: "02"
+        - generic [ref=e135]: The method
+      - generic [ref=e136]:
+        - heading "Live before your next coffee break." [level=2] [ref=e138]:
+          - text: Live before your
+          - text: next coffee break.
+        - generic [ref=e139]:
+          - generic [ref=e141]:
+            - generic [ref=e142]: (01)
+            - generic [ref=e143]:
+              - heading "Share what you know" [level=3] [ref=e144]
+              - paragraph [ref=e145]: Drag in help docs, paste your website, answer a few questions. No code.
+            - generic [ref=e147]:
+              - paragraph [ref=e148]: Drop in what you already have
+              - generic [ref=e149]:
+                - generic [ref=e150]:
+                  - generic [ref=e151]: Pricing & plans.pdf
+                  - generic [ref=e152]: 12 pages ✓
+                - generic [ref=e153]:
+                  - generic [ref=e154]: Help articles
+                  - generic [ref=e155]: 38 imported ✓
+                - generic [ref=e156]:
+                  - generic [ref=e157]: Your website
+                  - generic [ref=e158]: read automatically ✓
+                - generic [ref=e159]: + drag files · paste links
+          - generic [ref=e161]:
+            - generic [ref=e162]: (02)
+            - generic [ref=e163]:
+              - heading "Clarix learns your business" [level=3] [ref=e164]
+              - paragraph [ref=e165]: Minutes later it knows your products, policies, and tone. And shows you what it learned.
+            - generic [ref=e167]:
+              - paragraph [ref=e168]: What it learned
+              - generic [ref=e169]:
+                - generic [ref=e171]:
+                  - generic [ref=e172]: Pricing & billing
+                  - generic [ref=e173]: 14 answers
+                - generic [ref=e176]:
+                  - generic [ref=e177]: Product & features
+                  - generic [ref=e178]: 21 answers
+                - generic [ref=e181]:
+                  - generic [ref=e182]: Security & privacy
+                  - generic [ref=e183]: 12 answers
+              - paragraph [ref=e185]: 47 answers ready, 3 minutes after upload
+          - generic [ref=e187]:
+            - generic [ref=e188]: (03)
+            - generic [ref=e189]:
+              - heading "It starts answering" [level=3] [ref=e190]
+              - paragraph [ref=e191]: It appears on your site the same day. Instant, on-brand replies.
+            - generic [ref=e193]:
+              - generic [ref=e199]: yourcompany.com
+              - generic [ref=e205]:
+                - generic [ref=e206]: Hi! Need a hand?
+                - generic [ref=e207]: A
+              - generic [ref=e208]: It just appears on your site. No redesign needed
+    - generic [ref=e210]:
+      - generic [ref=e212]:
+        - generic [ref=e213]: "03"
+        - generic [ref=e214]: The proof
+      - generic [ref=e216]:
+        - generic [ref=e217]:
+          - generic [ref=e218]:
+            - heading "It never guesses." [level=2] [ref=e219]
+            - paragraph [ref=e220]: One invented refund policy costs more than a year of saved tickets. So Clarix was built to never invent.
+          - generic [ref=e221]:
+            - generic [ref=e223]:
+              - generic [ref=e224]: "01"
+              - paragraph [ref=e225]: Every answer shows exactly where it came from
+            - generic [ref=e227]:
+              - generic [ref=e228]: "02"
+              - paragraph [ref=e229]: Questions it can't answer go to a human, with full context
+            - generic [ref=e231]:
+              - generic [ref=e232]: "03"
+              - paragraph [ref=e233]: You review what it knows before customers ever see it
+          - button "Try to trip it up" [ref=e235] [cursor=pointer]:
+            - text: Try to trip it up
+            - generic [ref=e236]: ↘
+        - generic [ref=e238]:
+          - generic [ref=e239]: "0"
+          - paragraph [ref=e240]: Invented answers. Ever.
+    - generic [ref=e242]:
+      - generic [ref=e244]:
+        - generic [ref=e245]: "04"
+        - generic [ref=e246]: The numbers
+      - generic [ref=e247]:
+        - generic [ref=e248]:
+          - generic [ref=e249]:
+            - generic [ref=e250]:
+              - generic [ref=e252]: 0%
+              - generic [ref=e253]: Resolved instantly
+            - generic [ref=e254]:
+              - generic [ref=e255]: ~3s
+              - generic [ref=e256]: First response
+            - generic [ref=e257]:
+              - generic [ref=e258]: 24/7
+              - generic [ref=e259]: Coverage
+            - generic [ref=e260]:
+              - generic [ref=e262]: 0h
+              - generic [ref=e263]: Returned monthly
+          - paragraph [ref=e264]: Typical once Clarix knows your business. Tracked live in your dashboard
+        - generic [ref=e266]:
+          - generic [ref=e267]:
+            - generic [ref=e268]: The week
+            - generic [ref=e269]: Before
+            - generic [ref=e270]: With Clarix
+          - generic [ref=e271]:
+            - generic [ref=e272]: First response
+            - generic [ref=e273]: 4+ hours
+            - generic [ref=e274]: Seconds
+          - generic [ref=e275]:
+            - generic [ref=e276]: Coverage
+            - generic [ref=e277]: 9 to 5, weekdays
+            - generic [ref=e278]: 24/7, every day
+          - generic [ref=e279]:
+            - generic [ref=e280]: Reaching your team
+            - generic [ref=e281]: Every question
+            - generic [ref=e282]: Only the hard ones
+          - generic [ref=e283]:
+            - generic [ref=e284]: Consistency
+            - generic [ref=e285]: Depends who replies
+            - generic [ref=e286]: Same right answer, every time
+    - generic [ref=e289]:
+      - paragraph [ref=e290]:
+        - text: We could paste a glowing testimonial here. Instead, the demo is live.
+        - button "Ask it the hard questions yourself." [ref=e291] [cursor=pointer]
+      - paragraph [ref=e292]: No fake logos. No invented quotes. Just the product.
+    - generic [ref=e294]:
+      - generic [ref=e296]:
+        - generic [ref=e297]: "05"
+        - generic [ref=e298]: Questions
+      - generic [ref=e299]:
+        - heading "Asked every single demo." [level=2] [ref=e301]
+        - generic [ref=e302]:
+          - group [ref=e304]:
+            - generic "01 Will it make things up?" [ref=e305] [cursor=pointer]:
+              - generic [ref=e306]: "01"
+              - generic [ref=e307]: Will it make things up?
+              - generic [ref=e308]: +
+          - group [ref=e310]:
+            - generic "02 How long does setup take?" [ref=e311] [cursor=pointer]:
+              - generic [ref=e312]: "02"
+              - generic [ref=e313]: How long does setup take?
+              - generic [ref=e314]: +
+          - group [ref=e316]:
+            - generic "03 Will it sound like our brand?" [ref=e317] [cursor=pointer]:
+              - generic [ref=e318]: "03"
+              - generic [ref=e319]: Will it sound like our brand?
+              - generic [ref=e320]: +
+          - group [ref=e322]:
+            - generic "04 What happens when it can't answer?" [ref=e323] [cursor=pointer]:
+              - generic [ref=e324]: "04"
+              - generic [ref=e325]: What happens when it can't answer?
+              - generic [ref=e326]: +
+          - group [ref=e328]:
+            - generic "05 Can we test it on our own docs?" [ref=e329] [cursor=pointer]:
+              - generic [ref=e330]: "05"
+              - generic [ref=e331]: Can we test it on our own docs?
+              - generic [ref=e332]: +
+    - contentinfo [ref=e333]:
+      - generic [ref=e334]:
+        - generic [ref=e335]:
+          - paragraph [ref=e336]: Last thing
+          - heading "Right now, a customer is waiting for an answer." [level=2] [ref=e337]:
+            - text: Right now, a customer
+            - text: is waiting for an answer.
+          - generic [ref=e338]:
+            - link "Explore the full demo" [ref=e339] [cursor=pointer]:
+              - /url: /onboarding
+              - button "Explore the full demo" [ref=e340]
+            - link "Test it on your own data ↗" [ref=e341] [cursor=pointer]:
+              - /url: mailto:fixitdavid7@gmail.com?subject=Clarix%20pilot%3A%20test%20it%20on%20our%20data
+        - generic [ref=e342]:
+          - generic [ref=e343]: © 2026 Clarix
+          - generic [ref=e344]:
+            - link "Method" [ref=e345] [cursor=pointer]:
+              - /url: "#method"
+            - link "Proof" [ref=e346] [cursor=pointer]:
+              - /url: "#proof"
+            - link "FAQ" [ref=e347] [cursor=pointer]:
+              - /url: "#faq"
+            - link "Sign in" [ref=e348] [cursor=pointer]:
+              - /url: /dashboard
+          - generic [ref=e349]: AI support, done properly
+      - generic [ref=e351]: Clarix
+    - button "Open chat demo" [ref=e353] [cursor=pointer]:
+      - img [ref=e355]
+  - button "Open Next.js Dev Tools" [ref=e362] [cursor=pointer]:
+    - img [ref=e363]

@@ -2,21 +2,21 @@
  * Tiny in-memory sliding-window rate limiter for the chat endpoint.
  *
  * Clarix is self-hosted and the widget can be embedded on any public
- * site — which means the OpenAI key attached to a project could be
+ * site, which means the OpenAI key attached to a project could be
  * drained by a bot hammering /api/chat on a customer's homepage. This
  * limiter is the first line of defense: it caps how many messages a
  * single conversation (or an anonymous caller without one) can fire
  * per minute.
  *
  * Knobs via env:
- *   CLARIX_CHAT_RATE_LIMIT     — max messages per window (default 30)
- *   CLARIX_CHAT_RATE_WINDOW_MS — window size in ms      (default 60000)
- *   CLARIX_CHAT_RATE_DISABLED  — set to "1" to turn off (not recommended)
+ *   CLARIX_CHAT_RATE_LIMIT    , max messages per window (default 30)
+ *   CLARIX_CHAT_RATE_WINDOW_MS, window size in ms      (default 60000)
+ *   CLARIX_CHAT_RATE_DISABLED , set to "1" to turn off (not recommended)
  *
  * This is intentionally in-memory. A self-hosted single-instance
  * deployment doesn't need Redis for this; a multi-instance deployment
  * should front the app with an HTTP-level limiter (Cloudflare, Vercel,
- * nginx) — this limiter just stops trivial abuse on the hot path.
+ * nginx), this limiter just stops trivial abuse on the hot path.
  */
 
 const WINDOW_MS = Number(process.env.CLARIX_CHAT_RATE_WINDOW_MS ?? 60_000);
@@ -29,7 +29,7 @@ type Bucket = { timestamps: number[] };
 // and "ip:<addr>" for anonymous callers.
 const buckets = new Map<string, Bucket>();
 
-// Lazy cleanup — on each hit we prune any buckets that haven't been
+// Lazy cleanup, on each hit we prune any buckets that haven't been
 // touched in 5 minutes so the map doesn't grow unbounded on a noisy
 // public widget. No background timer needed.
 let lastPrune = Date.now();

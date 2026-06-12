@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { SourceCard } from "@/components/knowledge/source-card";
 import { KBGuideButton } from "@/components/knowledge/kb-guide";
 import { getCategoryIcon } from "@/lib/knowledge/category-icons";
-import type { KnowledgeSource, KnowledgeCategory } from "@/lib/db/types";
+import type { KnowledgeSource, KnowledgeCategory, PublicProject } from "@/lib/db/types";
 
 interface CategoryWithStats extends KnowledgeCategory {
   stats: {
@@ -40,6 +40,7 @@ export default function KnowledgePage() {
   const [loading, setLoading] = useState(true);
   const [seedingDemo, setSeedingDemo] = useState(false);
   const [seedError, setSeedError] = useState<string | null>(null);
+  const [project, setProject] = useState<PublicProject | null>(null);
 
   async function refresh() {
     const [sRes, cRes] = await Promise.all([
@@ -52,6 +53,10 @@ export default function KnowledgePage() {
   }
 
   useEffect(() => {
+    fetch("/api/project")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p: PublicProject | null) => setProject(p))
+      .catch(() => {});
     async function load() {
       await refresh();
       setLoading(false);
@@ -72,7 +77,7 @@ export default function KnowledgePage() {
       if (!res.ok) {
         setSeedError(
           data?.code === "missing_openai_key"
-            ? "Add your OpenAI API key in Settings first, then try again."
+            ? "Add your AI API key in Settings first, then try again."
             : data?.error || "Couldn't load demo content. Try again."
         );
         return;
@@ -119,6 +124,8 @@ export default function KnowledgePage() {
     ? `/dashboard/knowledge/new?categoryId=${activeCategory.id}`
     : "/dashboard/knowledge/new";
 
+  const locked = project?.demoLocked ?? false;
+
   return (
     <div>
       {/* Hero header */}
@@ -131,7 +138,7 @@ export default function KnowledgePage() {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-6 sm:flex-wrap">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-sand-900 tracking-tighter">
-              Knowledge Base
+              Knowledge
             </h1>
             <p className="text-sm sm:text-base text-sand-600 mt-2 max-w-xl">
               Organize what your agent knows. Structured categories lead to
@@ -140,23 +147,14 @@ export default function KnowledgePage() {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <KBGuideButton />
-            {sources.length === 0 && !loading && (
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={handleLoadDemo}
-                disabled={seedingDemo}
-              >
-                <Wand2 className="w-4 h-4" />
-                {seedingDemo ? "Loading demo…" : "Load sample content"}
-              </Button>
+            {!locked && (
+              <Link href={addHref}>
+                <Button size="lg">
+                  <Plus className="w-4 h-4" />
+                  Add source
+                </Button>
+              </Link>
             )}
-            <Link href={addHref}>
-              <Button size="lg">
-                <Plus className="w-4 h-4" />
-                Add source
-              </Button>
-            </Link>
           </div>
         </div>
         {seedError && (
@@ -185,7 +183,7 @@ export default function KnowledgePage() {
           />
           <StatTile
             icon={<Sparkles className="w-4 h-4" />}
-            label="Total chunks"
+            label="Answers ready"
             value={sources
               .reduce((sum, s) => sum + s.metadata.chunkCount, 0)
               .toLocaleString()}
@@ -195,7 +193,7 @@ export default function KnowledgePage() {
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] lg:grid-cols-[260px_1fr] gap-6 md:gap-8">
-        {/* Category sidebar — on mobile it scrolls horizontally so the source
+        {/* Category sidebar, on mobile it scrolls horizontally so the source
             list stays the focal point; on tablet+ it's a sticky left rail. */}
         <aside className="md:space-y-1 -mx-4 sm:mx-0">
           <p className="hidden md:block text-xs font-semibold text-sand-500 uppercase tracking-wide px-3 mb-2">
@@ -319,7 +317,7 @@ export default function KnowledgePage() {
             </div>
           )}
 
-          {/* Content — scrollable area so a long source list never
+          {/* Content, scrollable area so a long source list never
               extends the entire dashboard page height. */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

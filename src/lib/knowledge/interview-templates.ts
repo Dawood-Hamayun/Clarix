@@ -36,7 +36,7 @@ export const INTERVIEW_TEMPLATES: Record<string, InterviewTemplate> = {
       {
         id: "audience",
         question: "Who is it for?",
-        hint: "Your ideal customer — be specific.",
+        hint: "Your ideal customer, be specific.",
         placeholder: "e.g. SaaS founders and support leads at 10-100 person companies.",
       },
       {
@@ -69,13 +69,13 @@ export const INTERVIEW_TEMPLATES: Record<string, InterviewTemplate> = {
       },
       {
         id: "elevator",
-        question: "Elevator pitch — what does it do in ~2 sentences?",
+        question: "Elevator pitch, what does it do in ~2 sentences?",
         multiline: true,
       },
       {
         id: "features",
         question: "List the top 3-5 features (one per line)",
-        hint: "Don't overthink it — the real wins.",
+        hint: "Don't overthink it, the real wins.",
         multiline: true,
       },
       {
@@ -100,7 +100,7 @@ export const INTERVIEW_TEMPLATES: Record<string, InterviewTemplate> = {
         id: "plans",
         question: "What plans do you offer? (name + price + who it's for, one per line)",
         placeholder:
-          "Starter — $19/mo — solo creators\nPro — $49/mo — small teams\nBusiness — custom — larger orgs",
+          "Starter, $19/mo, solo creators\nPro, $49/mo, small teams\nBusiness, custom, larger orgs",
         multiline: true,
       },
       {
@@ -116,7 +116,7 @@ export const INTERVIEW_TEMPLATES: Record<string, InterviewTemplate> = {
       },
       {
         id: "billing",
-        question: "Billing specifics — monthly/annual, currencies, discounts",
+        question: "Billing specifics, monthly/annual, currencies, discounts",
         optional: true,
         multiline: true,
       },
@@ -132,12 +132,12 @@ export const INTERVIEW_TEMPLATES: Record<string, InterviewTemplate> = {
   faq: {
     title: "Let's capture your top FAQs",
     subtitle:
-      "Paste or list the questions customers ask most — I'll format them nicely.",
+      "Paste or list the questions customers ask most, I'll format them nicely.",
     questions: [
       {
         id: "topQuestions",
         question: "List the questions customers ask most",
-        hint: "One per line. Don't worry about answers yet — we'll do those next.",
+        hint: "One per line. Don't worry about answers yet, we'll do those next.",
         multiline: true,
       },
       {
@@ -165,14 +165,14 @@ export const INTERVIEW_TEMPLATES: Record<string, InterviewTemplate> = {
       },
       {
         id: "prereqs",
-        question: "Prerequisites — what does the user need first?",
+        question: "Prerequisites, what does the user need first?",
         optional: true,
         multiline: true,
       },
       {
         id: "steps",
         question: "Rough steps, in order (one per line)",
-        hint: "Just get the order right — I'll polish the wording.",
+        hint: "Just get the order right, I'll polish the wording.",
         multiline: true,
       },
       {
@@ -230,7 +230,7 @@ export const INTERVIEW_TEMPLATES: Record<string, InterviewTemplate> = {
     questions: [
       {
         id: "channels",
-        question: "Support channels — email, phone, chat, etc.",
+        question: "Support channels, email, phone, chat, etc.",
         multiline: true,
       },
       {

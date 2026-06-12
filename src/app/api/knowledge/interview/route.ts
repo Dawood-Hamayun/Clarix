@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateText } from "ai";
-import { getOpenAIProvider, MissingOpenAIKeyError } from "@/lib/ai/client";
+import { getChatModel, MissingOpenAIKeyError } from "@/lib/ai/client";
 import { store } from "@/lib/db/store";
 import {
   getTemplate,
@@ -100,9 +100,9 @@ Here is the raw Q&A from the user. Turn it into a polished Markdown knowledge-ba
 
 ${qaBlock}`;
 
-    let openai;
+    let model;
     try {
-      openai = getOpenAIProvider(projectId);
+      model = getChatModel(projectId);
     } catch (err) {
       if (err instanceof MissingOpenAIKeyError) {
         return NextResponse.json(
@@ -115,7 +115,7 @@ ${qaBlock}`;
 
     try {
       const { text } = await generateText({
-        model: openai("gpt-4o"),
+        model,
         system,
         prompt,
         temperature: 0.3,

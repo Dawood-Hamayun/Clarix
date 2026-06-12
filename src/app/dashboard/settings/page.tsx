@@ -72,12 +72,10 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [savedKey, setSavedKey] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
   // API key field state is kept separate from the project object because
   // the server only ever returns a boolean (`hasOpenAIApiKey`), never the
-  // raw key — so we need a scratch input to let the user paste a new one.
+  // raw key, so we need a scratch input to let the user paste a new one.
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [showKeyField, setShowKeyField] = useState(false);
   const [clearingKey, setClearingKey] = useState(false);
@@ -108,18 +106,6 @@ export default function SettingsPage() {
     setSaving(null);
   };
 
-  const handleDeleteProject = async () => {
-    setDeleting(true);
-    try {
-      await fetch("/api/project", { method: "DELETE" });
-      // Clear any onboarding session state so the flow starts fresh
-      sessionStorage.removeItem("clarix_onboarding");
-      router.push("/onboarding");
-    } catch {
-      setDeleting(false);
-    }
-  };
-
   if (loading || !project) {
     return (
       <div className="space-y-4">
@@ -129,6 +115,52 @@ export default function SettingsPage() {
             className="h-44 bg-sand-100 border border-sand-200 rounded-2xl animate-pulse"
           />
         ))}
+      </div>
+    );
+  }
+
+  // Demo lock: settings are read-only while CLARIX_DEMO_MODE=true.
+  // Show a clean summary instead of disabled forms.
+  if (project?.demoLocked) {
+    return (
+      <div className="max-w-xl mx-auto pt-10">
+        <div className="bg-white border border-sand-200 rounded-2xl shadow-sand p-8 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-sand-900 text-white flex items-center justify-center mx-auto mb-5 text-lg font-bold select-none">
+            {(project.widgetConfig.companyName || "A")[0]}
+          </div>
+          <h1 className="text-2xl font-bold text-sand-900 tracking-tighter">
+            {project.widgetConfig.companyName || project.name}
+          </h1>
+          <p className="label-mono text-sand-400 mt-2">
+            Demo workspace · settings locked
+          </p>
+          <div className="mt-7 text-left divide-y divide-sand-150 border-y border-sand-150">
+            <div className="flex items-center justify-between py-3.5">
+              <span className="text-sm text-sand-500">Agent</span>
+              <span className="text-sm font-semibold text-sand-900">
+                {project.agentConfig.agentName || "Ava"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-3.5">
+              <span className="text-sm text-sand-500">Status</span>
+              <span className="text-sm font-semibold text-sand-900 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-status-success" />
+                Online
+              </span>
+            </div>
+            <div className="flex items-center justify-between py-3.5">
+              <span className="text-sm text-sand-500">Knowledge</span>
+              <span className="text-sm font-semibold text-sand-900">
+                Loaded and locked
+              </span>
+            </div>
+          </div>
+          <p className="text-xs text-sand-400 mt-6 leading-relaxed">
+            This workspace is frozen for the demo so nothing can break
+            mid-walkthrough. Identity, knowledge, and configuration are all
+            read-only.
+          </p>
+        </div>
       </div>
     );
   }
@@ -334,7 +366,7 @@ export default function SettingsPage() {
             <CardTitle>When the agent can&apos;t answer</CardTitle>
             <CardDescription>
               Decide exactly what your agent says when the knowledge base
-              doesn&apos;t cover a question — the message, who to point at,
+              doesn&apos;t cover a question, the message, who to point at,
               and whether to proactively check in after answering.
             </CardDescription>
           </div>
@@ -397,7 +429,7 @@ export default function SettingsPage() {
                   },
                 })
               }
-              hint="Help center, contact form, Slack invite — whatever you use."
+              hint="Help center, contact form, Slack invite, whatever you use."
             />
           </div>
 
@@ -452,217 +484,11 @@ export default function SettingsPage() {
       {/* Categories manager */}
       <CategoriesCard projectId={project.id} />
 
-      {/* OpenAI API key */}
-      <Card>
-        <div className="flex items-start gap-3 flex-wrap">
-          <SectionIcon icon={KeyRound} />
-          <div className="flex-1 min-w-0">
-            <CardTitle>OpenAI API key</CardTitle>
-            <CardDescription>
-              Clarix uses your own OpenAI key for chat (GPT-4o) and
-              embeddings. It&apos;s stored server-side against this project
-              and never sent back to the browser.
-            </CardDescription>
-          </div>
-          {project.hasOpenAIApiKey ? (
-            <span className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide bg-status-success/10 text-status-success border border-status-success/20">
-              <Check className="w-3 h-3" />
-              Configured
-            </span>
-          ) : (
-            <span className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide bg-sand-100 text-sand-500 border border-sand-200">
-              Not set
-            </span>
-          )}
-        </div>
-
-        <div className="mt-5 space-y-4">
-          {project.hasOpenAIApiKey && !showKeyField ? (
-            <div className="bg-sand-50 border border-sand-200 rounded-xl px-4 py-3 flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
-              <div className="font-mono text-sm text-sand-500 flex-1 min-w-0 truncate">
-                sk-••••••••••••••••••••••••
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setShowKeyField(true);
-                  setApiKeyInput("");
-                }}
-              >
-                Replace
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                loading={clearingKey}
-                onClick={async () => {
-                  if (
-                    !confirm(
-                      "Remove the OpenAI key for this project? Chat and ingestion will stop working until you add a new one."
-                    )
-                  )
-                    return;
-                  setClearingKey(true);
-                  const res = await fetch("/api/project", {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      projectId: project.id,
-                      openAIApiKey: "",
-                    }),
-                  });
-                  if (res.ok) {
-                    const updated: PublicProject = await res.json();
-                    setProject(updated);
-                  }
-                  setClearingKey(false);
-                }}
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                Clear
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Input
-                label="Paste your OpenAI API key"
-                placeholder="sk-..."
-                value={apiKeyInput}
-                onChange={(e) => setApiKeyInput(e.target.value)}
-                hint={
-                  <span>
-                    Get one from{" "}
-                    <a
-                      href="https://platform.openai.com/api-keys"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline font-semibold text-sand-800 hover:text-sand-900"
-                    >
-                      platform.openai.com/api-keys
-                    </a>
-                    . You&apos;ll need a paid OpenAI account with credit.
-                  </span>
-                }
-              />
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={async () => {
-                    const trimmed = apiKeyInput.trim();
-                    if (!trimmed) return;
-                    setSaving("apiKey");
-                    const res = await fetch("/api/project", {
-                      method: "PATCH",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        projectId: project.id,
-                        openAIApiKey: trimmed,
-                      }),
-                    });
-                    if (res.ok) {
-                      const updated: PublicProject = await res.json();
-                      setProject(updated);
-                      setApiKeyInput("");
-                      setShowKeyField(false);
-                      setSavedKey("apiKey");
-                      setTimeout(() => setSavedKey(null), 1500);
-                    }
-                    setSaving(null);
-                  }}
-                  loading={saving === "apiKey"}
-                  disabled={!apiKeyInput.trim()}
-                >
-                  <Save className="w-4 h-4" />
-                  {savedKey === "apiKey" ? "Saved!" : "Save key"}
-                </Button>
-                {showKeyField && project.hasOpenAIApiKey && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setShowKeyField(false);
-                      setApiKeyInput("");
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      </Card>
 
       {/* OpenAI usage */}
       <UsageCard projectId={project.id} />
 
       {/* Danger */}
-      <Card className="border-status-error/30">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-status-error/10 text-status-error flex items-center justify-center shrink-0">
-            <AlertTriangle className="w-4 h-4" />
-          </div>
-          <div className="flex-1">
-            <CardTitle className="text-status-error">Danger zone</CardTitle>
-            <CardDescription>
-              Permanently delete this project and everything in it — sources,
-              chunks, conversations, feedback. You&apos;ll be returned to the
-              onboarding flow with a fresh project.
-            </CardDescription>
-          </div>
-        </div>
-        <div className="mt-5">
-          <AnimatePresence mode="wait" initial={false}>
-            {!confirmDelete ? (
-              <motion.div
-                key="trigger"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => setConfirmDelete(true)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Delete project
-                </Button>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="confirm"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 4 }}
-                className="flex items-center gap-3 flex-wrap"
-              >
-                <span className="text-sm font-semibold text-status-error">
-                  Are you sure? This wipes all data.
-                </span>
-                <div className="flex items-center gap-2 ml-auto">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setConfirmDelete(false)}
-                    disabled={deleting}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={handleDeleteProject}
-                    loading={deleting}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Yes, delete everything
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </Card>
       </div>
     </div>
   );
@@ -749,20 +575,10 @@ function UsageCard({ projectId }: { projectId: string }) {
       <div className="flex items-start gap-3">
         <SectionIcon icon={Gauge} />
         <div className="flex-1">
-          <CardTitle>OpenAI usage</CardTitle>
+          <CardTitle>Usage</CardTitle>
           <CardDescription>
-            Rolling spend on chat for this project. OpenAI doesn&apos;t expose
-            remaining credit to the API, so you&apos;ll need to top up or check
-            balance at{" "}
-            <a
-              href="https://platform.openai.com/account/usage"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline font-semibold text-sand-800 hover:text-sand-900"
-            >
-              platform.openai.com/account/usage
-            </a>
-            .
+            Rolling token usage for chat on this project, tracked locally
+            from each reply.
           </CardDescription>
         </div>
       </div>
@@ -800,7 +616,7 @@ function UsageCard({ projectId }: { projectId: string }) {
 
       {usage && usage.since && (
         <p className="mt-4 text-[11px] text-sand-400 tracking-tight">
-          Since {new Date(usage.since).toLocaleString()} · at published gpt-4o
+          Since {new Date(usage.since).toLocaleString()} · at standard model rates
           pricing ($2.50 / 1M prompt, $10 / 1M completion)
         </p>
       )}

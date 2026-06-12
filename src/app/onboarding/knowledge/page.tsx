@@ -65,20 +65,20 @@ export default function OnboardingKnowledge() {
   async function handleLoadDemo() {
     setSeedError(null);
     setSeedingDemo(true);
-    // Fake a smooth progress feed while the server processes — the real
+    // Fake a smooth progress feed while the server processes, the real
     // /api/demo/seed call is one round-trip but processing 13 docs takes
     // several seconds for embeddings. The progress bar gives the user
     // something to watch.
     const stages = [
       "About Acme Cloud",
       "Acme Cloud features",
-      "Acme Copilot — AI features deep dive",
+      "Acme Copilot, AI features deep dive",
       "Pricing and plans",
-      "Pricing FAQ — common billing questions",
+      "Pricing FAQ, common billing questions",
       "Frequently asked questions",
       "How to reset your password",
       "Inviting team members",
-      "Getting started — your first workspace",
+      "Getting started, your first workspace",
       "Troubleshooting common issues",
       "Privacy and data policy",
       "Security and compliance",
@@ -116,7 +116,7 @@ export default function OnboardingKnowledge() {
         return;
       }
 
-      // Final state — show completion summary
+      // Final state, show completion summary
       setDemoProgress({
         current: stages.length,
         total: stages.length,
@@ -195,7 +195,7 @@ export default function OnboardingKnowledge() {
         </p>
       </div>
 
-      {/* Demo loader — completion state */}
+      {/* Demo loader, completion state */}
       {demoResult && !processing && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
@@ -221,7 +221,7 @@ export default function OnboardingKnowledge() {
         </motion.div>
       )}
 
-      {/* Demo loader — in-progress state */}
+      {/* Demo loader, in-progress state */}
       {seedingDemo && demoProgress && !demoResult && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -275,7 +275,7 @@ export default function OnboardingKnowledge() {
 
       {!processing && !seedingDemo && !demoResult ? (
         <>
-          {/* "Just exploring?" demo banner — primary CTA before the
+          {/* "Just exploring?" demo banner, primary CTA before the
               upload tiles, so first-time users have a one-click path to
               a fully populated KB. */}
           <motion.button
@@ -301,8 +301,8 @@ export default function OnboardingKnowledge() {
                   </span>
                 </div>
                 <p className="text-sm text-sand-300 mt-1 leading-relaxed">
-                  Pre-loads 8 docs across all 7 categories — pricing, FAQ,
-                  policies, how-tos — for a fictional B2B SaaS, so you can
+                  Pre-loads 8 docs across all 7 categories, pricing, FAQ,
+                  policies, how-tos, for a fictional B2B SaaS, so you can
                   try chat, citations, and analytics in 30 seconds.
                 </p>
               </div>

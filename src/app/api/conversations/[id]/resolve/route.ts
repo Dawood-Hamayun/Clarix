@@ -7,7 +7,7 @@ import { store } from "@/lib/db/store";
  * `metadata.customerResolution`, which takes priority over per-message
  * thumbs feedback when the dashboard derives conversation status.
  *
- * Body: `{ resolved: boolean }` — `true` marks the chat resolved,
+ * Body: `{ resolved: boolean }`, `true` marks the chat resolved,
  * `false` marks it unresolved. Pass `null` to clear the override and
  * fall back to feedback aggregation.
  */

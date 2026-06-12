@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type {
   Conversation,
   KnowledgeSource,
+  PublicProject,
   SourceCitation,
 } from "@/lib/db/types";
 import type { UIMessage } from "ai";
@@ -84,14 +85,22 @@ export default function PlaygroundPage() {
   const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
   const [hydrating, setHydrating] = useState(true);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [project, setProject] = useState<PublicProject | null>(null);
 
   useEffect(() => {
     fetch("/api/knowledge")
       .then((r) => r.json())
       .then(setSources);
 
+    fetch("/api/project")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p: PublicProject | null) => setProject(p))
+      .catch(() => {
+        /* chat falls back to a generic agent identity */
+      });
+
     // Starter questions are generated from the live KB so they're always
-    // answerable — see /api/starter-suggestions. No more "how does this
+    // answerable, see /api/starter-suggestions. No more "how does this
     // work?" prompts that send the agent into meta territory.
     fetch("/api/starter-suggestions", {
       method: "POST",
@@ -103,7 +112,7 @@ export default function PlaygroundPage() {
         if (Array.isArray(data.suggestions)) setSuggestions(data.suggestions);
       })
       .catch(() => {
-        /* fall back to empty — EmptyState just hides them */
+        /* fall back to empty, EmptyState just hides them */
       });
 
     let cancelled = false;
@@ -172,7 +181,7 @@ export default function PlaygroundPage() {
       ? `Continuing your session · ${initialMessages.length} message${
           initialMessages.length === 1 ? "" : "s"
         }`
-      : "New session — ask anything to get started";
+      : "New session, ask anything to get started";
 
   return (
     <div>
@@ -189,6 +198,8 @@ export default function PlaygroundPage() {
               subtitle={headerSubtitle}
               onStartFresh={handleStartFresh}
               startFreshDisabled={hydrating}
+              agentName={project?.agentConfig?.agentName}
+              greeting={project?.widgetConfig?.greeting}
             />
           )}
           {hydrating && (
@@ -196,19 +207,19 @@ export default function PlaygroundPage() {
           )}
         </div>
 
-        {/* Sidebar — order is intentional: the live retrieval inspector
+        {/* Sidebar, order is intentional: the live retrieval inspector
             sits at the top because it's the only panel that changes
             with each question. The static "How it works" rationale and
             the KB summary live below so they don't push real-time
             information off screen. */}
         <div className="flex flex-col gap-4 lg:h-[calc(100vh-14rem)] lg:min-h-[480px]">
-          {/* 1. Retrieved sources — primary, flex-1 */}
+          {/* 1. Retrieved sources, primary, flex-1 */}
           <div className="bg-sand-100 border border-sand-200 rounded-xl overflow-hidden lg:flex-1 lg:min-h-0 flex flex-col min-h-[260px]">
             <div className="px-5 pt-5 pb-3 shrink-0">
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-warm-orange" />
                 <h3 className="text-sm font-semibold text-sand-900">
-                  Retrieved sources
+                  What it looked up
                 </h3>
                 {retrieving && (
                   <Loader2 className="w-3.5 h-3.5 text-sand-400 animate-spin ml-auto" />
@@ -272,8 +283,8 @@ export default function PlaygroundPage() {
                     exit={{ opacity: 0 }}
                   >
                     {lastQuery
-                      ? "No relevant chunks found."
-                      : "Ask a question to see which sources were fetched."}
+                      ? "Nothing in the knowledge matched that question."
+                      : "Ask a question and watch the agent show its work here."}
                   </motion.p>
                 )}
               </AnimatePresence>
@@ -283,26 +294,26 @@ export default function PlaygroundPage() {
           {/* 2. How it works */}
           <div className="bg-sand-100 border border-sand-200 rounded-xl p-5">
             <h3 className="text-sm font-semibold text-sand-900 mb-2">
-              How it works
+              How it answers
             </h3>
             <ol className="space-y-2 text-xs text-sand-600">
               <li className="flex gap-2">
                 <span className="w-5 h-5 rounded-full bg-warm-orange-light text-warm-orange text-xs flex items-center justify-center shrink-0 font-medium">
                   1
                 </span>
-                Your question gets embedded into a vector
+                It reads the question, like a person would
               </li>
               <li className="flex gap-2">
                 <span className="w-5 h-5 rounded-full bg-warm-orange-light text-warm-orange text-xs flex items-center justify-center shrink-0 font-medium">
                   2
                 </span>
-                We find the most relevant chunks from your KB
+                Finds the most relevant parts of your knowledge
               </li>
               <li className="flex gap-2">
                 <span className="w-5 h-5 rounded-full bg-warm-orange-light text-warm-orange text-xs flex items-center justify-center shrink-0 font-medium">
                   3
                 </span>
-                GPT-4o answers using only that context
+                Answers from that, and only that. Never invents
               </li>
             </ol>
           </div>
@@ -328,7 +339,7 @@ export default function PlaygroundPage() {
                   <p className="text-2xl font-bold text-sand-900">
                     {totalChunks}
                   </p>
-                  <p className="text-xs text-sand-500">Chunks</p>
+                  <p className="text-xs text-sand-500">Answers ready</p>
                 </div>
               </div>
             ) : (

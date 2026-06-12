@@ -8,9 +8,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clarix — AI Customer Support Agent",
+  title: "Clarix, Every customer question, answered in seconds",
   description:
-    "Build your AI support agent in minutes. Upload your knowledge base and let Clarix handle customer questions.",
+    "Clarix learns your docs, your policies, and your voice, then resolves most customer questions instantly, 24/7. Live in 15 minutes, no engineers needed.",
 };
 
 export default function RootLayout({

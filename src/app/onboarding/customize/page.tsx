@@ -88,7 +88,7 @@ export default function OnboardingCustomize() {
   const [project, setProject] = useState<PublicProject | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Local form state — initialised from project once it loads
+  // Local form state, initialised from project once it loads
   const [agentName, setAgentName] = useState("");
   const [personality, setPersonality] = useState<AgentPersonality>("friendly");
   const [color, setColor] = useState("#1F1B16");

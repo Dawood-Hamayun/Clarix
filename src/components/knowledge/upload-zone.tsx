@@ -73,7 +73,7 @@ export function UploadZone({ onFileContent }: UploadZoneProps) {
           {isDragging ? "Drop your file here" : "Drop a file or click to upload"}
         </p>
         <p className="text-xs text-sand-500 mt-1">
-          TXT, MD, PDF, CSV — up to 10MB
+          TXT, MD, PDF, CSV, up to 10MB
         </p>
       </motion.label>
 

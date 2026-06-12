@@ -11,13 +11,13 @@ import type {
 /**
  * Redis-backed persistence for the in-memory store.
  *
- * Strategy: one blob — the entire store is serialized as a JSON object
+ * Strategy: one blob, the entire store is serialized as a JSON object
  * under a single key. We hydrate on first access and debounce-write on
  * every mutation. It's not the most efficient approach, but for the
  * Clarix demo scale (hundreds of sources, thousands of messages) it
  * fits easily inside the Upstash free tier and avoids any schema work.
  *
- * Env vars — accepts either naming convention (Vercel's Upstash integration
+ * Env vars, accepts either naming convention (Vercel's Upstash integration
  * uses the KV_* names, a hand-configured Upstash dashboard uses the
  * UPSTASH_* names; we try both):
  *   - KV_REST_API_URL / UPSTASH_REDIS_REST_URL

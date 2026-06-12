@@ -5,8 +5,8 @@ import { FileText, Scissors, Brain, Database, Check } from "lucide-react";
 
 const stages = [
   { key: "parsing", label: "Parsing", detail: "Extracting text", icon: FileText },
-  { key: "chunking", label: "Chunking", detail: "Splitting into pieces", icon: Scissors },
-  { key: "embedding", label: "Embedding", detail: "Generating vectors", icon: Brain },
+  { key: "chunking", label: "Reading", detail: "Breaking it into answers", icon: Scissors },
+  { key: "embedding", label: "Learning", detail: "Connecting it to questions", icon: Brain },
   { key: "storing", label: "Storing", detail: "Saving to knowledge base", icon: Database },
 ];
 
@@ -122,7 +122,7 @@ export function ProcessingIndicator({
             </div>
           </div>
 
-          {/* Labels row — reserved height regardless of caption */}
+          {/* Labels row, reserved height regardless of caption */}
           <div className="col-span-4 grid grid-cols-4 mt-3">
             {stages.map((stage, i) => {
               const isActive = i === currentStage && !isDone;
@@ -169,7 +169,7 @@ export function ProcessingIndicator({
           >
             <Check className="w-4 h-4" strokeWidth={3} />
             {chunkCount
-              ? `Done — ${chunkCount} chunks from ${wordCount?.toLocaleString()} words`
+              ? `Done, ${chunkCount} chunks from ${wordCount?.toLocaleString()} words`
               : "Processing complete"}
           </motion.div>
         )}

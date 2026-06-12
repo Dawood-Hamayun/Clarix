@@ -28,7 +28,7 @@
   try {
     origin = new URL(script.src).origin;
   } catch (_) {
-    return; // Can't determine origin — bail.
+    return; // Can't determine origin, bail.
   }
 
   // Sizing constants. These are the *desktop* targets; on narrow or short
@@ -135,7 +135,7 @@
 
   function mount() {
     if (!document.body) {
-      // DOM not ready yet — defer.
+      // DOM not ready yet, defer.
       document.addEventListener("DOMContentLoaded", mount, { once: true });
       return;
     }
