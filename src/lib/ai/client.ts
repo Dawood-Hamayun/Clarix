@@ -6,18 +6,23 @@ import { store } from "@/lib/db/store";
 /**
  * Provider-neutral model resolver.
  *
- * Precedence:
- *   1. `GEMINI_API_KEY` (or `GOOGLE_GENERATIVE_AI_API_KEY`) from the
- *      environment. When set, the whole app runs on Google's free-tier
- *      Gemini models. Nothing about the provider is shown in the UI.
- *   2. The OpenAI key stored on the project during onboarding.
- *   3. `OPENAI_API_KEY` from the environment.
+ * The whole app uses ONE provider for both chat and embeddings, picked
+ * once here so query embeddings always match stored chunk embeddings
+ * (mixing providers breaks retrieval silently).
  *
- * Model ids are overridable via env so the host can pin whatever the
- * current free tier offers:
- *   CLARIX_CHAT_MODEL       (default gemini-2.5-flash / gpt-4o)
- *   CLARIX_FAST_MODEL       (default gemini-2.5-flash-lite / gpt-4o-mini)
- *   CLARIX_EMBEDDING_MODEL  (default gemini-embedding-001 / text-embedding-3-small)
+ * Precedence:
+ *   1. OpenAI (gpt-4o + text-embedding-3-small) when an OpenAI key is
+ *      available, either a per-project key or `OPENAI_API_KEY`. This is
+ *      the default because it's the most reliable.
+ *   2. Gemini, only when there is NO OpenAI key but `GEMINI_API_KEY`
+ *      (or `GOOGLE_GENERATIVE_AI_API_KEY`) is set. Lets a host run on
+ *      Google's free tier with no OpenAI key at all.
+ *
+ * To force Gemini even when an OpenAI key exists, set
+ * `CLARIX_AI_PROVIDER=gemini`. Model ids are overridable:
+ *   CLARIX_CHAT_MODEL       (default gpt-4o / gemini-2.5-flash)
+ *   CLARIX_FAST_MODEL       (default gpt-4o-mini / gemini-2.5-flash-lite)
+ *   CLARIX_EMBEDDING_MODEL  (default text-embedding-3-small / gemini-embedding-001)
  */
 
 export function resolveGeminiKey(): string | null {
@@ -41,15 +46,30 @@ export function resolveOpenAIKey(projectId: string): string | null {
 export class MissingOpenAIKeyError extends Error {
   constructor() {
     super(
-      "No AI API key configured. Set GEMINI_API_KEY in your environment, add an OpenAI key in Settings, or set OPENAI_API_KEY."
+      "No AI API key configured. Set OPENAI_API_KEY (or a per-project key), or set GEMINI_API_KEY for Google's free tier."
     );
     this.name = "MissingOpenAIKeyError";
   }
 }
 
+/**
+ * Decide which provider to use for this project. OpenAI wins unless
+ * there's no OpenAI key, or the host explicitly forces Gemini.
+ */
+function useGemini(projectId: string): boolean {
+  const forced = process.env.CLARIX_AI_PROVIDER?.trim().toLowerCase();
+  if (forced === "gemini" || forced === "google") {
+    return resolveGeminiKey() !== null;
+  }
+  if (forced === "openai") return false;
+  // Default: prefer OpenAI, fall back to Gemini only when no OpenAI key.
+  if (resolveOpenAIKey(projectId)) return false;
+  return resolveGeminiKey() !== null;
+}
+
 function googleProvider() {
   const apiKey = resolveGeminiKey();
-  if (!apiKey) return null;
+  if (!apiKey) throw new MissingOpenAIKeyError();
   return createGoogleGenerativeAI({ apiKey });
 }
 
@@ -66,20 +86,20 @@ export function getOpenAIProvider(projectId: string): OpenAIProvider {
 
 /** Main conversational model (chat, interview composer). */
 export function getChatModel(projectId: string): LanguageModel {
-  const google = googleProvider();
-  if (google) {
-    return google(process.env.CLARIX_CHAT_MODEL || "gemini-2.5-flash");
+  if (useGemini(projectId)) {
+    return googleProvider()(process.env.CLARIX_CHAT_MODEL || "gemini-2.5-flash");
   }
   return getOpenAIProvider(projectId)(
     process.env.CLARIX_CHAT_MODEL || "gpt-4o"
   );
 }
 
-/** Cheap, fast model for auxiliary calls (quick replies, suggestions). */
+/** Cheap, fast model for auxiliary calls (interview composer). */
 export function getFastModel(projectId: string): LanguageModel {
-  const google = googleProvider();
-  if (google) {
-    return google(process.env.CLARIX_FAST_MODEL || "gemini-2.5-flash-lite");
+  if (useGemini(projectId)) {
+    return googleProvider()(
+      process.env.CLARIX_FAST_MODEL || "gemini-2.5-flash-lite"
+    );
   }
   return getOpenAIProvider(projectId)(
     process.env.CLARIX_FAST_MODEL || "gpt-4o-mini"
@@ -88,9 +108,8 @@ export function getFastModel(projectId: string): LanguageModel {
 
 /** Embedding model for the RAG pipeline. */
 export function getEmbeddingModel(projectId: string): EmbeddingModel {
-  const google = googleProvider();
-  if (google) {
-    return google.textEmbedding(
+  if (useGemini(projectId)) {
+    return googleProvider().textEmbedding(
       process.env.CLARIX_EMBEDDING_MODEL || "gemini-embedding-001"
     );
   }
@@ -105,5 +124,5 @@ export function getEmbeddingModel(projectId: string): EmbeddingModel {
  * 400 before touching the AI SDK.
  */
 export function hasOpenAIKey(projectId: string): boolean {
-  return resolveGeminiKey() !== null || resolveOpenAIKey(projectId) !== null;
+  return resolveOpenAIKey(projectId) !== null || resolveGeminiKey() !== null;
 }
