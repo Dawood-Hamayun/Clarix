@@ -140,7 +140,8 @@ export async function retrieveContext(
   let queryEmbedding: number[];
   try {
     queryEmbedding = await generateEmbedding(query, projectId);
-  } catch {
+  } catch (err) {
+    console.error("[rag] query embedding failed:", err);
     return {
       systemPrompt: buildSystemPrompt(companyName, [], agentConfig),
       sources: [],
