@@ -18,6 +18,32 @@ import {
   type StoreSnapshot,
 } from "./persistence";
 import { vectorStore } from "./vector-store";
+import demoKb from "./demo-kb.json";
+
+/**
+ * Baked demo knowledge base, pre-chunked and pre-embedded offline by
+ * scripts/build-demo-kb.ts. Loaded deterministically on every boot so the
+ * Acme demo always has a full, working knowledge base with zero runtime
+ * embedding and no dependency on Redis. Re-generate the JSON if you edit
+ * DEMO_SOURCES (see the script header).
+ */
+type DemoKb = {
+  provider: string;
+  model: string;
+  dims: number;
+  sources: {
+    name: string;
+    categorySlug: string;
+    content: string;
+    chunks: {
+      content: string;
+      heading?: string;
+      position: number;
+      embedding: number[];
+    }[];
+  }[];
+};
+const DEMO_KB = demoKb as DemoKb;
 
 const DEFAULT_CATEGORIES: Omit<
   KnowledgeCategory,
@@ -234,7 +260,8 @@ class MemoryStore {
     this.projects.set(projectId, {
       id: projectId,
       name: "Acme Cloud",
-      description: "",
+      description:
+        "A fictional B2B SaaS used to showcase Clarix. Real product, real docs, real questions, just an imaginary company.",
       widgetConfig: {
         primaryColor: "#18181B",
         greeting: "Hi! I'm Ava, Acme Cloud's support agent. How can I help?",
@@ -246,7 +273,14 @@ class MemoryStore {
       agentConfig: {
         agentName: "Ava",
         personality: "friendly",
-        tagline: "",
+        tagline: "AI support for Acme Cloud, the team workspace for modern teams.",
+        // A warm, branded fallback so off-topic or unknown questions are
+        // handled gracefully instead of a flat refusal. This is what the
+        // agent says when nothing in the KB is relevant.
+        fallbackMessage:
+          "That's a great question, but it's a little outside what I can help with here. I'm best on anything about Acme Cloud, our product, pricing, account, security, and the like.",
+        fallbackContactEmail: "support@acmecloud.example",
+        fallbackContactUrl: "acmecloud.example/community",
       },
       createdAt: new Date().toISOString(),
     });
@@ -258,6 +292,79 @@ class MemoryStore {
         projectId,
       };
       this.categories.set(category.id, category);
+    }
+
+    this.loadDemoKnowledge(projectId);
+  }
+
+  /**
+   * Populate the demo project with the baked, pre-embedded knowledge base.
+   * Idempotent: skips any source already present. Runs synchronously with
+   * no network calls, so the demo KB is ready the instant the store exists.
+   */
+  private loadDemoKnowledge(projectId: string) {
+    const categoryBySlug = new Map(
+      Array.from(this.categories.values())
+        .filter((c) => c.projectId === projectId)
+        .map((c) => [c.slug, c.id])
+    );
+    const existing = new Set(
+      Array.from(this.sources.values())
+        .filter((s) => s.projectId === projectId)
+        .map((s) => s.name.toLowerCase())
+    );
+
+    const vectorEntries: {
+      chunkId: string;
+      sourceId: string;
+      projectId: string;
+      embedding: number[];
+    }[] = [];
+
+    for (const ds of DEMO_KB.sources) {
+      if (existing.has(ds.name.toLowerCase())) continue;
+      const categoryId = categoryBySlug.get(ds.categorySlug);
+      const sourceId = `src_demo_${ds.categorySlug}_${nanoid(6)}`;
+      const chunkIds: string[] = [];
+      const now = new Date().toISOString();
+
+      for (const dc of ds.chunks) {
+        const chunkId = `chunk_demo_${nanoid(8)}`;
+        this.chunks.set(chunkId, {
+          id: chunkId,
+          sourceId,
+          categoryId,
+          content: dc.content,
+          embedding: dc.embedding,
+          metadata: { position: dc.position, heading: dc.heading },
+        });
+        chunkIds.push(chunkId);
+        vectorEntries.push({ chunkId, sourceId, projectId, embedding: dc.embedding });
+      }
+
+      this.sources.set(sourceId, {
+        id: sourceId,
+        projectId,
+        categoryId,
+        name: ds.name,
+        type: "text",
+        content: ds.content,
+        status: "ready",
+        chunks: chunkIds,
+        metadata: {
+          wordCount: ds.content.split(/\s+/).length,
+          chunkCount: chunkIds.length,
+          createdAt: now,
+          updatedAt: now,
+        },
+      });
+    }
+
+    if (vectorEntries.length > 0) {
+      // Merge into the index without dropping anything already there.
+      for (const e of vectorEntries) {
+        void vectorStore.upsert(e);
+      }
     }
   }
 

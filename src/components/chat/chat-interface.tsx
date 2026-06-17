@@ -14,7 +14,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MarkdownRenderer } from "@/components/ui/markdown-renderer";
+import { SmoothMarkdown } from "@/components/ui/smooth-markdown";
 import type { ChatMessageMetadata } from "@/app/api/chat/route";
 import type { SourceCitation } from "@/lib/db/types";
 
@@ -94,6 +94,13 @@ export function ChatInterface({
   const isSubmitted = status === "submitted";
   const isStreaming = status === "streaming";
   const isLoading = isSubmitted || isStreaming;
+
+  // The id of the message currently being written, so only it gets the
+  // smooth typewriter reveal (history renders instantly).
+  const streamingMessageId =
+    isStreaming && messages[messages.length - 1]?.role === "assistant"
+      ? messages[messages.length - 1].id
+      : null;
 
   // Auto-scroll
   useEffect(() => {
@@ -250,6 +257,7 @@ export function ChatInterface({
                     activeSourceKey={activeSourceKey}
                     setActiveSourceKey={setActiveSourceKey}
                     agentName={agentName}
+                    streaming={message.id === streamingMessageId}
                   />
                 );
               })}
@@ -476,11 +484,13 @@ function MessageBubble({
   activeSourceKey,
   setActiveSourceKey,
   agentName,
+  streaming = false,
 }: {
   message: ChatMessage;
   activeSourceKey: string | null;
   setActiveSourceKey: (k: string | null) => void;
   agentName?: string;
+  streaming?: boolean;
 }) {
   const text = message.parts
     .filter((p): p is { type: "text"; text: string } => p.type === "text")
@@ -518,7 +528,7 @@ function MessageBubble({
       <AgentAvatar name={agentName} className="w-7 h-7 mt-1" />
       <div className="max-w-[85%] w-fit min-w-0">
         <div className="bg-white border border-sand-200 shadow-sand text-sand-900 rounded-2xl rounded-bl-md px-4 py-3">
-          <CitedMarkdown text={text} sources={sources} />
+          <CitedMarkdown text={text} sources={sources} animate={streaming} />
 
           {/* Sources list */}
           {sources.length > 0 && (
@@ -633,26 +643,32 @@ function ConfidenceBadge({
 function CitedMarkdown({
   text,
   sources,
+  animate = false,
 }: {
   text: string;
   sources: SourceCitation[];
+  animate?: boolean;
 }) {
-  // Render inline [N] markers as styled code pills by wrapping them with backticks.
-  // This is cheap, streaming-safe, and lets the existing prose stylesheet
-  // handle the look. The numbered source list below is where clicks happen.
-  if (sources.length === 0) {
-    return <MarkdownRenderer content={text} variant="compact" />;
-  }
+  // Render inline [N] markers as styled code pills by wrapping them in
+  // backticks. The transform is applied to the revealed slice (not the raw
+  // buffer) so the smooth reveal never cuts a pill mid-token.
+  const transform =
+    sources.length === 0
+      ? undefined
+      : (shown: string) =>
+          shown.replace(/\[(\d+)\]/g, (_, n) => {
+            const idx = parseInt(n, 10);
+            return idx >= 1 && idx <= sources.length ? `\`[${n}]\`` : `[${n}]`;
+          });
 
-  const transformed = text.replace(/\[(\d+)\]/g, (_, n) => {
-    const idx = parseInt(n, 10);
-    if (idx >= 1 && idx <= sources.length) {
-      return `\`[${n}]\``;
-    }
-    return `[${n}]`;
-  });
-
-  return <MarkdownRenderer content={transformed} variant="compact" />;
+  return (
+    <SmoothMarkdown
+      text={text}
+      animate={animate}
+      variant="compact"
+      transform={transform}
+    />
+  );
 }
 
 // Ensure Fragment import stays used

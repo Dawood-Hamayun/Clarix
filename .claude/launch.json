@@ -17,8 +17,9 @@
     {
       "name": "portfolio",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "/Users/dawoodhamayun/Projects/dawood-portfolio", "run", "dev", "--", "-p", "3200"],
-      "port": 3200
+      "runtimeArgs": ["--prefix", "/Users/dawoodhamayun/Projects/dawood-portfolio", "run", "dev"],
+      "port": 3000,
+      "autoPort": true
     }
   ]
 }

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import type { PublicProject, WidgetConfig } from "@/lib/db/types";
 import type { ChatMessageMetadata } from "@/app/api/chat/route";
-import { MarkdownRenderer } from "@/components/ui/markdown-renderer";
+import { SmoothMarkdown } from "@/components/ui/smooth-markdown";
 
 type ChatMessage = UIMessage<ChatMessageMetadata>;
 
@@ -334,6 +334,13 @@ function ChatPanel({
 
   const isLoading = status === "submitted" || status === "streaming";
 
+  // Only the message being written gets the smooth typewriter reveal.
+  const streamingMessageId =
+    status === "streaming" &&
+    messages[messages.length - 1]?.role === "assistant"
+      ? messages[messages.length - 1].id
+      : null;
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -471,6 +478,7 @@ function ChatPanel({
                 primaryColor={primaryColor}
                 feedback={feedback}
                 onFeedback={submitFeedback}
+                streaming={m.id === streamingMessageId}
               />
             ))}
             {status === "submitted" && <TypingBubble />}
@@ -555,11 +563,13 @@ function Bubble({
   primaryColor,
   feedback,
   onFeedback,
+  streaming = false,
 }: {
   message: ChatMessage;
   primaryColor: string;
   feedback: Record<string, FeedbackState>;
   onFeedback: (eventId: string, rating: "up" | "down") => void;
+  streaming?: boolean;
 }) {
   const text = message.parts
     .filter((p): p is { type: "text"; text: string } => p.type === "text")
@@ -582,8 +592,9 @@ function Bubble({
   if (message.role === "assistant") {
     if (!text) return null;
     // Strip inline [1] / [2] citation markers, the widget does not render the
-    // source list so they'd just be noise.
-    const clean = text.replace(/\s?\[\d+\]/g, "");
+    // source list so they'd just be noise. Applied to the revealed slice
+    // inside SmoothMarkdown so the typewriter never shows a bare "[1".
+    const stripCitations = (s: string) => s.replace(/\s?\[\d+\]/g, "");
     const eventId = message.metadata?.eventId;
     const fb = eventId ? feedback[eventId] : undefined;
 
@@ -597,7 +608,12 @@ function Bubble({
         </div>
         <div className="flex flex-col gap-1 max-w-[85%]">
           <div className="bg-white border border-sand-200 rounded-2xl rounded-tl-md px-3 py-2 text-sand-800">
-            <MarkdownRenderer content={clean} variant="compact" />
+            <SmoothMarkdown
+              text={text}
+              animate={streaming}
+              variant="compact"
+              transform={stripCitations}
+            />
           </div>
           {eventId && (
             <div className="flex items-center gap-1 pl-1">
